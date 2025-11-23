@@ -1,0 +1,37 @@
+{
+    "rood": [
+        {"x": 715, "naam": "Kuringersteenweg",        "prijs": 100, "huur": 40, "upgrade": 50, "eigenaar": null},
+        {"x": 635, "naam": "Koning Boudewijnlaan",    "prijs": 120, "huur": 50, "upgrade": 50, "eigenaar": null},
+        {"x": 555, "naam": "Kanaalkom",               "prijs": 140, "huur": 55, "upgrade": 75, "eigenaar": null},
+        {"x": 475, "naam": "Kempische Steenweg",      "prijs": 160, "huur": 60, "upgrade": 75, "eigenaar": null},
+        {"x": 395, "naam": "Luikersteenweg",          "prijs": 180, "huur": 65, "upgrade": 100, "eigenaar": null},
+        {"x": 315, "naam": "Groenplein",              "prijs": 200, "huur": 70, "upgrade": 100, "eigenaar": null},
+        {"x": 235, "naam": "Guffenslaan",             "prijs": 220, "huur": 80, "upgrade": 125, "eigenaar": null},
+        {"x": 155, "naam": "Hoogstraat",              "prijs": 240, "huur": 90, "upgrade": 150, "eigenaar": null}
+    ],
+
+    "groen": [
+        {"y": 490, "naam": "Botermarkt",              "prijs": 150, "huur": 45, "upgrade": 60, "eigenaar": null},
+        {"y": 400, "naam": "Fruitmarkt",              "prijs": 170, "huur": 50, "upgrade": 75, "eigenaar": null},
+        {"y": 310, "naam": "Kolonel Dusartplein",     "prijs": 190, "huur": 55, "upgrade": 75, "eigenaar": null},
+        {"y": 220, "naam": "Kapelstraat",             "prix": 210, "huur": 60, "upgrade": 100, "eigenaar": null}
+    ],
+
+    "blauw": [
+        {"x": 715, "naam": "Havermarkt",              "prijs": 260, "huur": 100, "upgrade": 150, "eigenaar": null},
+        {"x": 635, "naam": "Dusartstraat",            "prijs": 280, "huur": 110, "upgrade": 150, "eigenaar": null},
+        {"x": 555, "naam": "Ridderstraat",            "prijs": 300, "huur": 120, "upgrade": 175, "eigenaar": null},
+        {"x": 475, "naam": "Zuivelmarkt",             "prijs": 320, "huur": 130, "upgrade": 175, "eigenaar": null},
+        {"x": 395, "naam": "Groenplein Noord",        "prijs": 340, "huur": 140, "upgrade": 200, "eigenaar": null},
+        {"x": 315, "naam": "Mouterijstraat",          "prijs": 360, "huur": 150, "upgrade": 200, "eigenaar": null},
+        {"x": 235, "naam": "Jeneverplein",            "prijs": 380, "huur": 160, "upgrade": 250, "eigenaar": null},
+        {"x": 155, "naam": "Hoofdwachtlaan",          "prijs": 400, "huur": 170, "upgrade": 250, "eigenaar": null}
+    ],
+
+    "geel": [
+        {"y": 220, "naam": "TT-Wijk",                 "prijs": 180, "huur": 55, "upgrade": 100, "eigenaar": null},
+        {"y": 310, "naam": "Quartier Bleu",           "prijs": 200, "huur": 60, "upgrade": 100, "eigenaar": null},
+        {"y": 400, "naam": "Botanique",               "prijs": 220, "huur": 65, "upgrade": 125, "eigenaar": null},
+        {"y": 490, "naam": "Corda Campus",            "prijs": 240, "huur": 70, "upgrade": 150, "eigenaar": null}
+    ]
+}
