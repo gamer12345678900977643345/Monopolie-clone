@@ -13,7 +13,7 @@ with open(tile_ID, 'r') as json_file:
 print(data)
 
 def dobbelsteen():
-    dobb = random.randint(1,4)
+    dobb = random.randint(1,2)
     return dobb
 #stat text render
 font = pygame.font.SysFont("Tahoma", 30)
@@ -69,29 +69,84 @@ while running:
     #tile info check
     for vak in data["rood"]:
         kleur_x = vak["x"]
-        kleur_naam = vak["naam"]
-        kleur_prijs = str(vak["prijs"])
-        kleur_huur = str(vak["huur"])
-        kleur_upgrade = str(vak["upgrade"])
-        kleur_eigenaar = vak["eigenaar"]
-        stat_naam = font.render(kleur_naam, True, (230,230,230))
-        stat_prijs = font.render(f"Prijs: {kleur_prijs}", True, (230,230,230))
-        stat_huur = font.render(f"Huur: {kleur_huur}", True, (230,230,230))
-        stat_upgrade = font.render(f"Upgrade: {kleur_upgrade}", True, (230,230,230))
-        stat_eigenaar = font.render(f"Eigenaar: {kleur_eigenaar}", True, (230,230,230))
-        koop_knop = font.render("Koop nu", True, (230,230,230))
         if speler_pos_x == kleur_x and straat == "rood":
+
+            # teken het info vak
             pygame.draw.rect(bord.Screen.screen, (188, 180, 162), (900, 200,300,240))
             pygame.draw.rect(bord.Screen.screen, (80, 20, 20), (900, 200,300,240),5)
-            bord.Screen.screen.blit(stat_naam,(910,220))
-            bord.Screen.screen.blit(stat_prijs, (910,260))
-            bord.Screen.screen.blit(stat_huur, (910,300))
-            bord.Screen.screen.blit(stat_upgrade, (910,340))
-            bord.Screen.screen.blit(stat_eigenaar, (910,380))
-            if kleur_eigenaar == None:
+
+            # naam, prijs, huur, upgrade, eigenaar weergeven
+            bord.Screen.screen.blit(font.render(vak["naam"], True, (230,230,230)), (910,220))
+            bord.Screen.screen.blit(font.render(f"Prijs: {vak['prijs']}", True, (230,230,230)), (910,260))
+            bord.Screen.screen.blit(font.render(f"Huur: {vak['huur']}", True, (230,230,230)), (910,300))
+            bord.Screen.screen.blit(font.render(f"Upgrade: {vak['upgrade']}", True, (230,230,230)), (910,340))
+            bord.Screen.screen.blit(font.render(f"Eigenaar: {vak['eigenaar']}", True, (230,230,230)), (910,380))
+
+            # koop-knop tonen als geen eigenaar
+            if vak["eigenaar"] is None:
                 pygame.draw.rect(bord.Screen.screen, (200,200,100), (900, 450,300,60))
                 pygame.draw.rect(bord.Screen.screen, (80,20,20), (900, 450,300,60),5)
-                bord.Screen.screen.blit(koop_knop, (910, 460))
+                bord.Screen.screen.blit(font.render("Koop nu", True, (230,230,230)), (910,460))
+    for vak in data["geel"]:
+        kleur_y = vak["y"]
+        if speler_pos_y == kleur_y and straat == "geel":
+
+            # teken het info vak
+            pygame.draw.rect(bord.Screen.screen, (188, 180, 162), (900, 200,300,240))
+            pygame.draw.rect(bord.Screen.screen, (80, 20, 20), (900, 200,300,240),5)
+
+            # naam, prijs, huur, upgrade, eigenaar weergeven
+            bord.Screen.screen.blit(font.render(vak["naam"], True, (230,230,230)), (910,220))
+            bord.Screen.screen.blit(font.render(f"Prijs: {vak['prijs']}", True, (230,230,230)), (910,260))
+            bord.Screen.screen.blit(font.render(f"Huur: {vak['huur']}", True, (230,230,230)), (910,300))
+            bord.Screen.screen.blit(font.render(f"Upgrade: {vak['upgrade']}", True, (230,230,230)), (910,340))
+            bord.Screen.screen.blit(font.render(f"Eigenaar: {vak['eigenaar']}", True, (230,230,230)), (910,380))
+
+            # koop-knop tonen als geen eigenaar
+            if vak["eigenaar"] is None:
+                pygame.draw.rect(bord.Screen.screen, (200,200,100), (900, 450,300,60))
+                pygame.draw.rect(bord.Screen.screen, (80,20,20), (900, 450,300,60),5)
+                bord.Screen.screen.blit(font.render("Koop nu", True, (230,230,230)), (910,460))
+    for vak in data["groen"]:
+        kleur_y = vak["y"]
+        if speler_pos_y == kleur_y and straat == "groen":
+
+            # teken het info vak
+            pygame.draw.rect(bord.Screen.screen, (188, 180, 162), (900, 200,300,240))
+            pygame.draw.rect(bord.Screen.screen, (80, 20, 20), (900, 200,300,240),5)
+
+            # naam, prijs, huur, upgrade, eigenaar weergeven
+            bord.Screen.screen.blit(font.render(vak["naam"], True, (230,230,230)), (910,220))
+            bord.Screen.screen.blit(font.render(f"Prijs: {vak['prijs']}", True, (230,230,230)), (910,260))
+            bord.Screen.screen.blit(font.render(f"Huur: {vak['huur']}", True, (230,230,230)), (910,300))
+            bord.Screen.screen.blit(font.render(f"Upgrade: {vak['upgrade']}", True, (230,230,230)), (910,340))
+            bord.Screen.screen.blit(font.render(f"Eigenaar: {vak['eigenaar']}", True, (230,230,230)), (910,380))
+
+            # koop-knop tonen als geen eigenaar
+            if vak["eigenaar"] is None:
+                pygame.draw.rect(bord.Screen.screen, (200,200,100), (900, 450,300,60))
+                pygame.draw.rect(bord.Screen.screen, (80,20,20), (900, 450,300,60),5)
+                bord.Screen.screen.blit(font.render("Koop nu", True, (230,230,230)), (910,460))
+    for vak in data["blauw"]:
+        kleur_x = vak["x"]
+        if speler_pos_x == kleur_x and straat == "blauw":
+
+            # teken het info vak
+            pygame.draw.rect(bord.Screen.screen, (188, 180, 162), (900, 200,300,240))
+            pygame.draw.rect(bord.Screen.screen, (80, 20, 20), (900, 200,300,240),5)
+
+            # naam, prijs, huur, upgrade, eigenaar weergeven
+            bord.Screen.screen.blit(font.render(vak["naam"], True, (230,230,230)), (910,220))
+            bord.Screen.screen.blit(font.render(f"Prijs: {vak['prijs']}", True, (230,230,230)), (910,260))
+            bord.Screen.screen.blit(font.render(f"Huur: {vak['huur']}", True, (230,230,230)), (910,300))
+            bord.Screen.screen.blit(font.render(f"Upgrade: {vak['upgrade']}", True, (230,230,230)), (910,340))
+            bord.Screen.screen.blit(font.render(f"Eigenaar: {vak['eigenaar']}", True, (230,230,230)), (910,380))
+
+            # koop-knop tonen als geen eigenaar
+            if vak["eigenaar"] is None:
+                pygame.draw.rect(bord.Screen.screen, (200,200,100), (900, 450,300,60))
+                pygame.draw.rect(bord.Screen.screen, (80,20,20), (900, 450,300,60),5)
+                bord.Screen.screen.blit(font.render("Koop nu", True, (230,230,230)), (910,460))
 
 
 
