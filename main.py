@@ -52,6 +52,7 @@ speler_pos_y = 130
 clock = pygame.time.Clock()
 straat = "geel"
 running = True
+paused = False  # nieuwe variabele voor pauze status
 UI.intro() #start scherm
 while running:
     bord.Screen.screen.fill((75,170,75))#nice groen aub niet veranderen
@@ -62,38 +63,48 @@ while running:
             sys.exit()
         # speler turn dobbelsteen gooien
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if gooi_knop.collidepoint(event.pos):
-                dobb1=dobbelsteen()
-                dobb2=dobbelsteen()
-                dob_tot = dobb1 + dobb2
-                vakken_opgeschoven = dob_tot #moet spitsen naar x en y en in loop toevoegen
-                #speler beweegt langs gele straat
-                if straat == "geel":
-                    speler_pos_y += vakken_opgeschoven*90
-                    if speler_pos_y > 580:
-                        speler_pos_y = 580
-                        straat = "rood"
-                
-                elif straat == "rood":
-                    speler_pos_x -= vakken_opgeschoven*80
-                    if speler_pos_x < 75:
-                        speler_pos_x = 75
-                        straat = "groen"
-                
-                elif straat == "groen":
-                    speler_pos_y -= vakken_opgeschoven*90
-                    if speler_pos_y < 130:
-                        speler_pos_y = 130
-                        straat = "blauw"
-                
-                elif straat == "blauw":
-                    speler_pos_x += vakken_opgeschoven*80
-                    if speler_pos_x > 795:
-                        speler_pos_x = 795
-                        player.speler1.balans += 200
-                        straat= "geel"
-                
-                print(speler_pos)
+            # check menu knop eerst
+            if UI.menu_knop_rect.collidepoint(event.pos):
+                paused = not paused  # toggle pauze status
+            elif not paused:  # alleen andere knoppen als niet gepauzeerd
+                if gooi_knop.collidepoint(event.pos):
+                    dobb1=dobbelsteen()
+                    dobb2=dobbelsteen()
+                    dob_tot = dobb1 + dobb2
+                    vakken_opgeschoven = dob_tot #moet spitsen naar x en y en in loop toevoegen
+                    #speler beweegt langs gele straat
+                    if straat == "geel":
+                        speler_pos_y += vakken_opgeschoven*90
+                        if speler_pos_y > 580:
+                            speler_pos_y = 580
+                            straat = "rood"
+                    
+                    elif straat == "rood":
+                        speler_pos_x -= vakken_opgeschoven*80
+                        if speler_pos_x < 75:
+                            speler_pos_x = 75
+                            straat = "groen"
+                    
+                    elif straat == "groen":
+                        speler_pos_y -= vakken_opgeschoven*90
+                        if speler_pos_y < 130:
+                            speler_pos_y = 130
+                            straat = "blauw"
+                    
+                    elif straat == "blauw":
+                        speler_pos_x += vakken_opgeschoven*80
+                        if speler_pos_x > 795:
+                            speler_pos_x = 795
+                            player.speler1.balans += 200
+                            straat= "geel"
+                    
+                    print(speler_pos)
+            elif paused:  # check pauze menu knoppen
+                if UI.exit_knop_rect.collidepoint(event.pos):
+                    pygame.quit()
+                    sys.exit()
+                if UI.continue_knop_rect.collidepoint(event.pos):
+                    paused = False
 
     #tile info check
     for vak in data["rood"]:
@@ -173,6 +184,13 @@ while running:
     bord.Screen.screen.blit(player_0, speler_pos)#blit de speler pion
     bord.Screen.screen.blit(font.render(f"Budget: {player.speler1.balans}", True, (230,230,230)), (1200, 150))
     bord.Screen.screen.blit(font.render(f"Eigendommen: {player.speler1.eigendom}", True, (230,230,230)), (1200,200))
-    # UI.pause_menu()
+    
+    # teken pauze menu als gepauzeerd
+    if paused:
+        UI.pause_menu()
+    else:
+        # teken menu knop alleen als niet gepauzeerd
+        bord.Screen.screen.blit(UI.menu_knop, (600,0))
+    
     pygame.display.flip()
     clock.tick(60)

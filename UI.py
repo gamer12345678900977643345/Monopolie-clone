@@ -36,27 +36,22 @@ def start_settings():
     
     return
 
-exit_knop_rect = pygame.Rect(150,500,100,150)
-continue_knop_rect= pygame.Rect(150,700,100,150)
-def pause_menu():
-    bord.Screen.screen.blit(menu_knop, (600,0))
-    pygame.display.flip()
-    for event in pygame.event.get():
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if menu_knop_rect.collidepoint(event.pos):
-                blurr = pygame.Surface((1920,1080), pygame.SRCALPHA)
-                pygame.draw.rect(blurr, (255, 255, 255, 200), blurr.get_rect())
-                bord.Screen.screen.blit(blurr, (0,0)) #tot hier achtergrond
-                pygame.draw.rect(bord.Screen.screen, (230,100,100), exit_knop_rect)
-                pygame.draw.rect(bord.Screen.screen, (230,100,100),continue_knop_rect)
-                bord.Screen.screen.blit(font.render("EXIT", True,(230,230,230)), (185,560))
-                print("menu knop geactiveerd")
+exit_knop_rect = pygame.Rect(150,500,160,100)
+continue_knop_rect= pygame.Rect(150,700,160,100)
 
-                # bord.Screen.screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
+def pause_menu():
+    # teken blur en menu overlay
+    blurr = pygame.Surface((1920,1080), pygame.SRCALPHA)
+    pygame.draw.rect(blurr, (255, 255, 255, 210), blurr.get_rect())
+    bord.Screen.screen.blit(blurr, (0,0)) #tot hier achtergrond
     
-    pygame.display.flip()
+    # teken knoppen
+    pygame.draw.rect(bord.Screen.screen, (230,100,100), exit_knop_rect)
+    pygame.draw.rect(bord.Screen.screen, (230,100,100), continue_knop_rect)
+    bord.Screen.screen.blit(font.render("EXIT", True,(230,230,230)), (185,560))
+    bord.Screen.screen.blit(font.render("CONTINUE", True,(230,230,230)), (155,760))
+    
+    # teken menu knop bovenop
+    bord.Screen.screen.blit(menu_knop, (600,0))
+    
     return
-# def resume():
-#     for event in pygame.event.get():
-#         if event.type == pygame.MOUSEBUTTONDOWN:
-#             if continue_knop_rect.collidepoint(event.pos):
