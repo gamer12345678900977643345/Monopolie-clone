@@ -4,7 +4,7 @@ class Screen:
     breedte = 1280
     hoogte = 720
     screen = pygame.display.set_mode((breedte, hoogte), pygame.RESIZABLE)
-    pygame.display.set_caption("Moneypoly")
+    pygame.display.set_caption("Moneypolie")
 #dit mag wrs weg
 class Tile:
     tile_x_rel = 0.5

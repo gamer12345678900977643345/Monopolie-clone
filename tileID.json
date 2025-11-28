@@ -14,7 +14,7 @@
         {"y": 490, "naam": "Botermarkt",              "prijs": 150, "huur": 45, "upgrade": 60, "eigenaar": null},
         {"y": 400, "naam": "Fruitmarkt",              "prijs": 170, "huur": 50, "upgrade": 75, "eigenaar": null},
         {"y": 310, "naam": "Kolonel Dusartplein",     "prijs": 190, "huur": 55, "upgrade": 75, "eigenaar": null},
-        {"y": 220, "naam": "Kapelstraat",             "prix": 210, "huur": 60, "upgrade": 100, "eigenaar": null}
+        {"y": 220, "naam": "Kapelstraat",             "prijs": 210, "huur": 60, "upgrade": 100, "eigenaar": null}
     ],
 
     "blauw": [

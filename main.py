@@ -3,9 +3,9 @@ import sys
 import bord
 import json
 import random
+import player
+import UI
 pygame.init()
-
-bord.Screen.screen
 
 tile_ID = "tileID.json"
 with open(tile_ID, 'r') as json_file:
@@ -18,12 +18,41 @@ def dobbelsteen():
 #stat text render
 font = pygame.font.SysFont("Tahoma", 30)
 
+def info_screen():
+    pygame.draw.rect(bord.Screen.screen, (188, 180, 162), (900, 200,300,240))
+    pygame.draw.rect(bord.Screen.screen, (80, 20, 20), (900, 200,300,240),5)
+
+    # naam, prijs, huur, upgrade, eigenaar weergeven
+    bord.Screen.screen.blit(font.render(vak["naam"], True, (230,230,230)), (910,220))
+    bord.Screen.screen.blit(font.render(f"Prijs: {vak['prijs']}", True, (230,230,230)), (910,260))
+    bord.Screen.screen.blit(font.render(f"Huur: {vak['huur']}", True, (230,230,230)), (910,300))
+    bord.Screen.screen.blit(font.render(f"Upgrade: {vak['upgrade']}", True, (230,230,230)), (910,340))
+    bord.Screen.screen.blit(font.render(f"Eigenaar: {vak['eigenaar']}", True, (230,230,230)), (910,380))
+    return
+def koop_mechanisme():
+    koop_knop = pygame.draw.rect(bord.Screen.screen, (200,200,100), (900, 450,300,60))
+    pygame.draw.rect(bord.Screen.screen, (80,20,20), (900, 450,300,60),5)
+    bord.Screen.screen.blit(font.render("Koop nu", True, (230,230,230)), (910,460))
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        if koop_knop.collidepoint(event.pos):
+            if(player.speler1.balans > vak["prijs"]):
+                vak["eigenaar"] = "Speler1"
+                player.speler1.balans -= vak["prijs"]
+                player.speler1.eigendom += vak["prijs"]
+                print(player.speler1.balans)
+            else:
+                bord.Screen.screen.blit(font.render("Niet genoeg geld!", True, (230,230,230)), (1200,250))
+                print("you broke!")
+                pygame.display.flip()
+                pygame.time.wait(1000)
+    return
 
 speler_pos_x = 795
 speler_pos_y = 130
 clock = pygame.time.Clock()
 straat = "geel"
 running = True
+UI.intro() #start scherm
 while running:
     bord.Screen.screen.fill((75,170,75))#nice groen aub niet veranderen
     speler_pos = (speler_pos_x, speler_pos_y)
@@ -31,7 +60,6 @@ while running:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        
         # speler turn dobbelsteen gooien
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if gooi_knop.collidepoint(event.pos):
@@ -62,99 +90,56 @@ while running:
                     speler_pos_x += vakken_opgeschoven*80
                     if speler_pos_x > 795:
                         speler_pos_x = 795
+                        player.speler1.balans += 200
                         straat= "geel"
-
-
+                
                 print(speler_pos)
+
     #tile info check
     for vak in data["rood"]:
         kleur_x = vak["x"]
         if speler_pos_x == kleur_x and straat == "rood":
-
             # teken het info vak
-            pygame.draw.rect(bord.Screen.screen, (188, 180, 162), (900, 200,300,240))
-            pygame.draw.rect(bord.Screen.screen, (80, 20, 20), (900, 200,300,240),5)
-
-            # naam, prijs, huur, upgrade, eigenaar weergeven
-            bord.Screen.screen.blit(font.render(vak["naam"], True, (230,230,230)), (910,220))
-            bord.Screen.screen.blit(font.render(f"Prijs: {vak['prijs']}", True, (230,230,230)), (910,260))
-            bord.Screen.screen.blit(font.render(f"Huur: {vak['huur']}", True, (230,230,230)), (910,300))
-            bord.Screen.screen.blit(font.render(f"Upgrade: {vak['upgrade']}", True, (230,230,230)), (910,340))
-            bord.Screen.screen.blit(font.render(f"Eigenaar: {vak['eigenaar']}", True, (230,230,230)), (910,380))
-
+            info_screen()
             # koop-knop tonen als geen eigenaar
             if vak["eigenaar"] is None:
-                pygame.draw.rect(bord.Screen.screen, (200,200,100), (900, 450,300,60))
-                pygame.draw.rect(bord.Screen.screen, (80,20,20), (900, 450,300,60),5)
-                bord.Screen.screen.blit(font.render("Koop nu", True, (230,230,230)), (910,460))
+                koop_mechanisme()
+    
     for vak in data["geel"]:
         kleur_y = vak["y"]
         if speler_pos_y == kleur_y and straat == "geel":
-
             # teken het info vak
-            pygame.draw.rect(bord.Screen.screen, (188, 180, 162), (900, 200,300,240))
-            pygame.draw.rect(bord.Screen.screen, (80, 20, 20), (900, 200,300,240),5)
-
-            # naam, prijs, huur, upgrade, eigenaar weergeven
-            bord.Screen.screen.blit(font.render(vak["naam"], True, (230,230,230)), (910,220))
-            bord.Screen.screen.blit(font.render(f"Prijs: {vak['prijs']}", True, (230,230,230)), (910,260))
-            bord.Screen.screen.blit(font.render(f"Huur: {vak['huur']}", True, (230,230,230)), (910,300))
-            bord.Screen.screen.blit(font.render(f"Upgrade: {vak['upgrade']}", True, (230,230,230)), (910,340))
-            bord.Screen.screen.blit(font.render(f"Eigenaar: {vak['eigenaar']}", True, (230,230,230)), (910,380))
-
+            info_screen()
             # koop-knop tonen als geen eigenaar
             if vak["eigenaar"] is None:
-                pygame.draw.rect(bord.Screen.screen, (200,200,100), (900, 450,300,60))
-                pygame.draw.rect(bord.Screen.screen, (80,20,20), (900, 450,300,60),5)
-                bord.Screen.screen.blit(font.render("Koop nu", True, (230,230,230)), (910,460))
+                koop_mechanisme()
+    
     for vak in data["groen"]:
         kleur_y = vak["y"]
         if speler_pos_y == kleur_y and straat == "groen":
-
             # teken het info vak
-            pygame.draw.rect(bord.Screen.screen, (188, 180, 162), (900, 200,300,240))
-            pygame.draw.rect(bord.Screen.screen, (80, 20, 20), (900, 200,300,240),5)
-
-            # naam, prijs, huur, upgrade, eigenaar weergeven
-            bord.Screen.screen.blit(font.render(vak["naam"], True, (230,230,230)), (910,220))
-            bord.Screen.screen.blit(font.render(f"Prijs: {vak['prijs']}", True, (230,230,230)), (910,260))
-            bord.Screen.screen.blit(font.render(f"Huur: {vak['huur']}", True, (230,230,230)), (910,300))
-            bord.Screen.screen.blit(font.render(f"Upgrade: {vak['upgrade']}", True, (230,230,230)), (910,340))
-            bord.Screen.screen.blit(font.render(f"Eigenaar: {vak['eigenaar']}", True, (230,230,230)), (910,380))
-
+            info_screen()
             # koop-knop tonen als geen eigenaar
             if vak["eigenaar"] is None:
-                pygame.draw.rect(bord.Screen.screen, (200,200,100), (900, 450,300,60))
-                pygame.draw.rect(bord.Screen.screen, (80,20,20), (900, 450,300,60),5)
-                bord.Screen.screen.blit(font.render("Koop nu", True, (230,230,230)), (910,460))
+                koop_mechanisme()
+    
     for vak in data["blauw"]:
         kleur_x = vak["x"]
         if speler_pos_x == kleur_x and straat == "blauw":
-
             # teken het info vak
-            pygame.draw.rect(bord.Screen.screen, (188, 180, 162), (900, 200,300,240))
-            pygame.draw.rect(bord.Screen.screen, (80, 20, 20), (900, 200,300,240),5)
-
-            # naam, prijs, huur, upgrade, eigenaar weergeven
-            bord.Screen.screen.blit(font.render(vak["naam"], True, (230,230,230)), (910,220))
-            bord.Screen.screen.blit(font.render(f"Prijs: {vak['prijs']}", True, (230,230,230)), (910,260))
-            bord.Screen.screen.blit(font.render(f"Huur: {vak['huur']}", True, (230,230,230)), (910,300))
-            bord.Screen.screen.blit(font.render(f"Upgrade: {vak['upgrade']}", True, (230,230,230)), (910,340))
-            bord.Screen.screen.blit(font.render(f"Eigenaar: {vak['eigenaar']}", True, (230,230,230)), (910,380))
-
+            info_screen()
             # koop-knop tonen als geen eigenaar
             if vak["eigenaar"] is None:
-                pygame.draw.rect(bord.Screen.screen, (200,200,100), (900, 450,300,60))
-                pygame.draw.rect(bord.Screen.screen, (80,20,20), (900, 450,300,60),5)
-                bord.Screen.screen.blit(font.render("Koop nu", True, (230,230,230)), (910,460))
-
+                koop_mechanisme()
 
 
     gooi_knop = pygame.draw.rect(bord.Screen.screen, (20,20,20), (950, 100, 100,100))
-
+    
     for i in range(0, 10, 9):#witte hoeken
         pygame.draw.rect(bord.Screen.screen, (255, 255, 255), (80*i+75,130,80,90))
         pygame.draw.rect(bord.Screen.screen, (255, 255, 255), (80*i+75,580,80,90))
+        pygame.draw.rect(bord.Screen.screen, (0, 0, 0), (80*i+75,130,80,90), 1)
+        pygame.draw.rect(bord.Screen.screen, (0, 0, 0), (80*i+75,580,80,90), 1)
     
     # hieronder print alle vakken en straten op het scherm
     player_0 = pygame.image.load("assets/player0.png").convert_alpha()
@@ -166,14 +151,6 @@ while running:
         x = i * red_tile.get_width()
         y = 580
         bord.Screen.screen.blit(red_tile, (x+155,y)) #bottom row (80, 580)
-        #een soort tile-ID voor elk gegenereerd kopie van red_tile
-        #als speler land op vak met (x,y) coördinaat dan toon vak info/stats (zoals koop prijs, huurprijs, upgrade prijs)
-        #tile-ID kan met (x, y, w, h): (x = i * red_tile.get_width(), y= 580, red_tile.get_witdt(), red_tile.get_height())
-        #kan de tile tekenen in een- for i in range(1,5): - loop
-        #dan in if loops de game logica schrijven
-        #ik hoef de rectagle niet te tekenen, gewoon speler naar coordinaten sturen en in game logica if regels te gerbuiken
-        #om stats te tonen, de pion van de speler moet ook 80x90 zijn zodat de origens overeenkomen
-        # for loops gebruiken om tile-ID te generen 
     for i in range(4):
         x = 75 
         y = i *  green_tile.get_height()
@@ -192,12 +169,10 @@ while running:
         x = i * blue_tile.get_width()
         y = 130
         red_tile_ID = (x, y)#(80,90)
-        #print(red_tile_ID)
-        #tile-ID eigenschappen assignen
-        # for i in range(1,5):
-        #     red_tile_ID_info = i
-        #     print(red_tile_ID_info)
-
+    
     bord.Screen.screen.blit(player_0, speler_pos)#blit de speler pion
+    bord.Screen.screen.blit(font.render(f"Budget: {player.speler1.balans}", True, (230,230,230)), (1200, 150))
+    bord.Screen.screen.blit(font.render(f"Eigendommen: {player.speler1.eigendom}", True, (230,230,230)), (1200,200))
+    # UI.pause_menu()
     pygame.display.flip()
     clock.tick(60)
