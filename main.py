@@ -52,8 +52,29 @@ speler_pos_y = 130
 clock = pygame.time.Clock()
 straat = "geel"
 running = True
-paused = False  # nieuwe variabele voor pauze status
+paused = False 
 UI.intro() #start scherm
+player_mode_choose = True
+game_mode = ""
+while player_mode_choose == True:
+    UI.player_mode()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if UI.pvp_knop.collidepoint(event.pos):
+                naam1 = UI.start_settings()
+                player.speler1.naam = naam1
+                print(f"Speler 1: {naam1}")
+
+                naam2 = UI.start_settings()
+                player.speler2.naam = naam2
+                print(f"Speler 2: {naam2}")
+                game_mode = "pvp"
+                player_mode_choose = False
+            if UI.bot_knop.collidepoint(event.pos):
+                print("bot")
 while running:
     bord.Screen.screen.fill((75,170,75))#nice groen aub niet veranderen
     speler_pos = (speler_pos_x, speler_pos_y)
