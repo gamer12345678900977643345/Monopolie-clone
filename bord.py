@@ -22,6 +22,3 @@ class Tile:
     
 tiles = pygame.draw.rect(Screen.screen, (255,255,255), Tile.tile_rect)
 tile_pos = [(int(160*i)+50, int(i)+400) for i in range(4)]
-
-#print(f"tiles: {tiles}")    
-

@@ -11,4 +11,9 @@ speler1 = Speler(
     eigendommen= 0,
     effects= None
 )
-# print(speler1.naam)
+speler2 = Speler(
+    naam = "nig",
+    balans= 1500,
+    eigendommen= 0,
+    effects= None #dit kan bv zijn ga naar jail
+)
