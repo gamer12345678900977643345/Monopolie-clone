@@ -5,6 +5,8 @@ import json
 import random
 import player
 import UI
+import bot_mode
+import geluid
 pygame.init()
 
 tile_ID = "tileID.json"
@@ -46,7 +48,7 @@ def koop_mechanisme():
                 pygame.display.flip()
                 pygame.time.wait(1000)
     return
-
+geluid.background()
 speler_pos_x = 795
 speler_pos_y = 130
 clock = pygame.time.Clock()
@@ -74,6 +76,9 @@ while player_mode_choose == True:
                 game_mode = "pvp"
                 player_mode_choose = False
             if UI.bot_knop.collidepoint(event.pos):
+                game_mode = "bot"
+                player_mode_choose = False
+                bot_mode.bot_game()
                 print("bot")
 while running:
     bord.Screen.screen.fill((75,170,75))#nice groen aub niet veranderen
@@ -91,6 +96,8 @@ while running:
                 if gooi_knop.collidepoint(event.pos):
                     dobb1=dobbelsteen()
                     dobb2=dobbelsteen()
+                    geluid.dobbelsteen_effect()
+                    geluid.move_effect()
                     dob_tot = dobb1 + dobb2
                     vakken_opgeschoven = dob_tot #moet spitsen naar x en y en in loop toevoegen
                     #speler beweegt langs gele straat

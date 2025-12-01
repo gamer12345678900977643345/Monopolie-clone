@@ -1,7 +1,7 @@
 import pygame
 import bord
 import sys
-import player
+
 pygame.init()
 rect = pygame.Rect(540,400,200,100) #pos startknop vak
 moneypolie = pygame.image.load("assets/moneypolie.png").convert_alpha()
@@ -93,24 +93,33 @@ def start_settings():
     
     return user_name if user_name else "Speler1"
 
-exit_knop_rect = pygame.Rect(150,500,160,100)
+exit_knop_rect = pygame.Rect(150,550,160,100)
 continue_knop_rect= pygame.Rect(150,700,160,100)
+mute_knop_rect = pygame.Rect(150,250,150,100)
+unmute_knop_rect = pygame.Rect(150,400,150,100 )
 def pause_menu():
     # teken blur en menu overlay
     blurr = pygame.Surface((1920,1080), pygame.SRCALPHA)
     pygame.draw.rect(blurr, (255, 255, 255, 210), blurr.get_rect())
     bord.Screen.screen.blit(blurr, (0,0)) #tot hier achtergrond
-    
     # teken knoppen
     pygame.draw.rect(bord.Screen.screen, (230,100,100), exit_knop_rect)
     pygame.draw.rect(bord.Screen.screen, (230,100,100), continue_knop_rect)
-    bord.Screen.screen.blit(font.render("EXIT", True,(230,230,230)), (185,560))
-    bord.Screen.screen.blit(font.render("CONTINUE", True,(230,230,230)), (155,760))
+    pygame.draw.rect(bord.Screen.screen, (230,100,100), mute_knop_rect)
+    pygame.draw.rect(bord.Screen.screen, (230,100,100), unmute_knop_rect)
+    for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if mute_knop_rect.collidepoint(event.pos):
+                pygame.mixer.music.pause()
+            if unmute_knop_rect.collidepoint(event.pos):
+                pygame.mixer.music.unpause()
+    bord.Screen.screen.blit(font.render("EXIT", True,(230,230,230)), exit_knop_rect)
+    bord.Screen.screen.blit(font.render("CONTINUE", True,(230,230,230)), continue_knop_rect)
     bord.Screen.screen.blit(big_font.render("PAUSE", True, (10,10,10)), (600,0))
-    
+    bord.Screen.screen.blit(font.render("MUTE", True, (230,230,230)), mute_knop_rect)
+    bord.Screen.screen.blit(font.render("UNMUTE", True, (230,230,230)), unmute_knop_rect)
     # teken menu knop bovenop
     bord.Screen.screen.blit(menu_knop, (600,0))
-    
     return
 pvp_knop = pygame.Rect(800,300,200,100)
 bot_knop = pygame.Rect(800,450,200,100)

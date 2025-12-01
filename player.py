@@ -17,3 +17,9 @@ speler2 = Speler(
     eigendommen= 0,
     effects= None #dit kan bv zijn ga naar jail
 )
+bot1 = Speler(
+    naam = "bot",
+    balans= 1500,
+    eigendommen= 0,
+    effects= None
+)
