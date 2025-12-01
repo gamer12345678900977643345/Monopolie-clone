@@ -1,7 +1,7 @@
 import pygame
 import bord
 import sys
-
+import geluid
 pygame.init()
 rect = pygame.Rect(540,400,200,100) #pos startknop vak
 moneypolie = pygame.image.load("assets/moneypolie.png").convert_alpha()
@@ -111,8 +111,12 @@ def pause_menu():
         if event.type == pygame.MOUSEBUTTONDOWN:
             if mute_knop_rect.collidepoint(event.pos):
                 pygame.mixer.music.pause()
+                geluid.dobb_eff.set_volume(0)
+                geluid.move_eff.set_volume(0)
             if unmute_knop_rect.collidepoint(event.pos):
                 pygame.mixer.music.unpause()
+                geluid.dobb_eff.set_volume(1)
+                geluid.move_eff.set_volume(1)
     bord.Screen.screen.blit(font.render("EXIT", True,(230,230,230)), exit_knop_rect)
     bord.Screen.screen.blit(font.render("CONTINUE", True,(230,230,230)), continue_knop_rect)
     bord.Screen.screen.blit(big_font.render("PAUSE", True, (10,10,10)), (600,0))

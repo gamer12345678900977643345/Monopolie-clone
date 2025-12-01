@@ -48,114 +48,32 @@ def bot_game():
         return
 
     geluid.background()
-
-    posities = {
-        "speler": {"x": 795, "y": 130, 'straat' : 'geel', "budget": 1500, "eigendom": 0},
-        "bot": {"x": 795, "y": 130, 'straat' : 'geel', "budget": 1500, "eigendom": 0}
-    }
-    clock = pygame.time.Clock()
-    net_gegooid = False
-    paused = False
-    running = True
-    while running:
-        bord.Screen.screen.fill((75,170,75))#nice groen aub niet veranderen
-        # speler_pos = (speler_pos_x, speler_pos_y)
-        huidige = "bot" if beurt_num % 2 == 0 else "speler"
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            # speler turn dobbelsteen gooien
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                # check menu knop eerst
-                if UI.menu_knop_rect.collidepoint(event.pos):
-                    paused = not paused  # toggle pauze status
-                elif not paused:  # alleen andere knoppen als niet gepauzeerd
-                    if gooi_knop.collidepoint(event.pos):
-                        dobb1=dobbelsteen()
-                        dobb2=dobbelsteen()
-                        geluid.dobbelsteen_effect()
-                        geluid.move_effect()
-                        dob_tot = dobb1 + dobb2
-                        vakken_opgeschoven = dob_tot #moet spitsen naar x en y en in loop toevoegen
-                        net_gegooid = True
-                        print(huidige)
-                        print(beurt_num)
-                        #speler beweegt langs gele straat
-                        if posities[huidige]['straat'] == 'geel':
-                            posities[huidige]["y"] += vakken_opgeschoven*90
-                            if posities[huidige]["y"] > 580:
-                                posities[huidige]["y"] = 580
-                                posities[huidige]['straat'] = 'rood'
-                        
-                        elif posities[huidige]['straat'] == 'rood':
-                            posities[huidige]["x"] -= vakken_opgeschoven*80
-                            if posities[huidige]["x"] < 75:
-                                posities[huidige]["x"] = 75
-                                posities[huidige]['straat'] = 'groen'
-                        
-                        elif posities[huidige]['straat'] == 'groen':
-                            posities[huidige]["y"] -= vakken_opgeschoven*90
-                            if posities[huidige]["y"] < 130:
-                                posities[huidige]["y"] = 130
-                                posities[huidige]['straat'] = 'blauw'
-                        
-                        elif posities[huidige]['straat'] == 'blauw':
-                            posities[huidige]["x"] += vakken_opgeschoven*80
-                            if posities[huidige]["x"] > 795:
-                                posities[huidige]["x"] = 795
-                                posities[huidige]["budget"] += 200
-                                posities[huidige]['straat']= 'geel'
-                        beurt_num +=1
-                        
-                        # print(speler_pos)
-                elif paused:  # check pauze menu knoppen
-                    if UI.exit_knop_rect.collidepoint(event.pos):
-                        pygame.quit()
-                        sys.exit()
-                    if UI.continue_knop_rect.collidepoint(event.pos):
-                        paused = False
-
-        #tile info check
-        for vak in data['rood']:
-            kleur_x = vak["x"]
-            if posities[huidige]["x"] == kleur_x and posities[huidige]['straat'] == 'rood':
-                # teken het info vak
-                info_screen()
-                # koop-knop tonen als geen eigenaar
-                if vak["eigenaar"] is None:
-                    koop_mechanisme()
+    def move_logica():
+        if posities[huidige]['straat'] == 'geel':
+            posities[huidige]["y"] += vakken_opgeschoven*90
+            if posities[huidige]["y"] > 580:
+                posities[huidige]["y"] = 580
+                posities[huidige]['straat'] = 'rood'
         
-        for vak in data['geel']:
-            kleur_y = vak["y"]
-            if posities[huidige]["y"] == kleur_y and posities[huidige]['straat'] == 'geel':
-                # teken het info vak
-                info_screen()
-                # koop-knop tonen als geen eigenaar
-                if vak["eigenaar"] is None:
-                    koop_mechanisme()
+        elif posities[huidige]['straat'] == 'rood':
+            posities[huidige]["x"] -= vakken_opgeschoven*80
+            if posities[huidige]["x"] < 75:
+                posities[huidige]["x"] = 75
+                posities[huidige]['straat'] = 'groen'
         
-        for vak in data['groen']:
-            kleur_y = vak["y"]
-            if posities[huidige]["y"] == kleur_y and posities[huidige]['straat'] == 'groen':
-                # teken het info vak
-                info_screen()
-                # koop-knop tonen als geen eigenaar
-                if vak["eigenaar"] is None:
-                    koop_mechanisme()
+        elif posities[huidige]['straat'] == 'groen':
+            posities[huidige]["y"] -= vakken_opgeschoven*90
+            if posities[huidige]["y"] < 130:
+                posities[huidige]["y"] = 130
+                posities[huidige]['straat'] = 'blauw'
         
-        for vak in data['blauw']:
-            kleur_x = vak["x"]
-            if posities[huidige]["x"] == kleur_x and posities[huidige]['straat'] == 'blauw':
-                # teken het info vak
-                info_screen()
-                # koop-knop tonen als geen eigenaar
-                if vak["eigenaar"] is None:
-                    koop_mechanisme()
-
-
-        gooi_knop = pygame.draw.rect(bord.Screen.screen, (20,20,20), (950, 100, 100,100))
-        
+        elif posities[huidige]['straat'] == 'blauw':
+            posities[huidige]["x"] += vakken_opgeschoven*80
+            if posities[huidige]["x"] > 795:
+                posities[huidige]["x"] = 795
+                posities[huidige]["budget"] += 200
+                posities[huidige]['straat']= 'geel'
+    def teken_alles():
         for i in range(0, 10, 9):#witte hoeken
             pygame.draw.rect(bord.Screen.screen, (255, 255, 255), (80*i+75,130,80,90))
             pygame.draw.rect(bord.Screen.screen, (255, 255, 255), (80*i+75,580,80,90))
@@ -207,3 +125,117 @@ def bot_game():
         
         pygame.display.flip()
         clock.tick(60)
+    posities = {
+        "speler": {"x": 795, "y": 130, 'straat' : 'geel', "budget": 1500, "eigendom": 0},
+        "bot": {"x": 795, "y": 130, 'straat' : 'geel', "budget": 1500, "eigendom": 0}
+    }
+    clock = pygame.time.Clock()
+    paused = False
+    running = True
+    while running:
+        bord.Screen.screen.fill((75,170,75))#nice groen aub niet veranderen
+        # speler_pos = (speler_pos_x, speler_pos_y)
+        huidige = "bot" if beurt_num % 2 == 0 else "speler"
+        #tile info check
+        for vak in data['rood']:
+            kleur_x = vak["x"]
+            if posities[huidige]["x"] == kleur_x and posities[huidige]['straat'] == 'rood':
+                # teken het info vak
+                info_screen()
+                # koop-knop tonen als geen eigenaar
+                if vak["eigenaar"] is None:
+                    koop_mechanisme()
+        
+        for vak in data['geel']:
+            kleur_y = vak["y"]
+            if posities[huidige]["y"] == kleur_y and posities[huidige]['straat'] == 'geel':
+                # teken het info vak
+                info_screen()
+                # koop-knop tonen als geen eigenaar
+                if vak["eigenaar"] is None:
+                    koop_mechanisme()
+        
+        for vak in data['groen']:
+            kleur_y = vak["y"]
+            if posities[huidige]["y"] == kleur_y and posities[huidige]['straat'] == 'groen':
+                # teken het info vak
+                info_screen()
+                # koop-knop tonen als geen eigenaar
+                if vak["eigenaar"] is None:
+                    koop_mechanisme()
+        
+        for vak in data['blauw']:
+            kleur_x = vak["x"]
+            if posities[huidige]["x"] == kleur_x and posities[huidige]['straat'] == 'blauw':
+                # teken het info vak
+                info_screen()
+                # koop-knop tonen als geen eigenaar
+                if vak["eigenaar"] is None:
+                    koop_mechanisme()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            # speler turn dobbelsteen gooien
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # check menu knop eerst
+                if UI.menu_knop_rect.collidepoint(event.pos):
+                    paused = not paused  # toggle pauze status
+                elif not paused and huidige == "speler":  # alleen andere knoppen als niet gepauzeerd
+                    if gooi_knop.collidepoint(event.pos):
+                        dobb1=dobbelsteen()
+                        dobb2=dobbelsteen()
+                        geluid.dobb_eff.play()
+                        geluid.move_eff.play()
+                        dob_tot = dobb1 + dobb2
+                        vakken_opgeschoven = dob_tot #moet spitsen naar x en y en in loop toevoegen
+                        print(huidige)
+                        print(beurt_num)
+                        #speler beweegt langs gele straat
+                        move_logica()
+                        beurt_num +=1
+                        teken_alles()
+                        pygame.draw.rect(bord.Screen.screen, (20,20,20), (950, 100, 100,100))
+                        pygame.display.flip()
+                        pygame.time.wait(1000)
+
+                        huidige = "bot"
+                        for vak in data[posities["bot"]["straat"]]:
+                            if posities["bot"]["straat"] == "rood" or posities["bot"]["straat"] == "blauw":
+                                if posities["bot"]["x"] == vak["x"]:
+                                    if vak["eigenaar"] is None:
+                                        if posities["bot"]["budget"] > vak["prijs"]:
+                                            vak["eigenaar"] = "bot"
+                                            posities["bot"]["budget"] -= vak["prijs"]
+                                            posities["bot"]["eigendom"] += vak["prijs"]
+                            
+                            elif posities["bot"]["straat"] == "geel" or posities["bot"]["straat"] == "groen":
+                                if posities["bot"]["y"] == vak["y"]:
+                                    if vak["eigenaar"] is None:
+                                        if posities["bot"]["budget"] > vak["prijs"]:
+                                            vak["eigenaar"] = "bot"
+                                            posities["bot"]["budget"] -= vak["prijs"]
+                                            posities["bot"]["eigendom"] += vak["prijs"]
+
+                        beurt_num += 1
+                        dobb1=dobbelsteen()
+                        dobb2=dobbelsteen()
+                        geluid.dobb_eff.play()
+                        geluid.move_eff.play()
+                        dob_tot = dobb1 + dobb2
+                        vakken_opgeschoven = dob_tot #moet spitsen naar x en y en in loop toevoegen
+                        print(huidige)
+                        print(beurt_num)
+                        #speler beweegt langs gele straat
+                        move_logica()
+                    # print(speler_pos)
+                elif paused:  # check pauze menu knoppen
+                    if UI.exit_knop_rect.collidepoint(event.pos):
+                        pygame.quit()
+                        sys.exit()
+                    if UI.continue_knop_rect.collidepoint(event.pos):
+                        paused = False
+
+        gooi_knop = pygame.draw.rect(bord.Screen.screen, (20,20,20), (950, 100, 100,100))
+        
+        teken_alles()

@@ -96,8 +96,8 @@ while running:
                 if gooi_knop.collidepoint(event.pos):
                     dobb1=dobbelsteen()
                     dobb2=dobbelsteen()
-                    geluid.dobbelsteen_effect()
-                    geluid.move_effect()
+                    geluid.dobb_eff.play()
+                    geluid.move_eff.play()
                     dob_tot = dobb1 + dobb2
                     vakken_opgeschoven = dob_tot #moet spitsen naar x en y en in loop toevoegen
                     #speler beweegt langs gele straat
