@@ -210,8 +210,8 @@ while running:
         red_tile_ID = (x, y)#(80,90)
     
     bord.Screen.screen.blit(player_0, speler_pos)#blit de speler pion
-    bord.Screen.screen.blit(font.render(f"Budget: {player.speler1.balans}", True, (230,230,230)), (1200, 150))
-    bord.Screen.screen.blit(font.render(f"Eigendommen: {player.speler1.eigendom}", True, (230,230,230)), (1200,200))
+    bord.Screen.screen.blit(font.render(f"Budget: {player.speler1.balans}", True, (230,230,230)), (200, 220))
+    bord.Screen.screen.blit(font.render(f"Eigendommen: {player.speler1.eigendom}", True, (230,230,230)), (200,270))
     
     # teken pauze menu als gepauzeerd
     if paused:

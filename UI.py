@@ -9,6 +9,8 @@ menu_knop = pygame.image.load("assets/menu_icon.png").convert_alpha()
 menu_knop_rect = pygame.Rect(600,0,30,30)
 font = pygame.font.SysFont("Tahoma", 30)
 big_font = pygame.font.SysFont("Tahoma", 100)
+speler_owned = pygame.image.load("assets/owned.png").convert_alpha()
+bot_owned = pygame.image.load("assets/owned_bot.png").convert_alpha()
 def intro():
     blurr = pygame.Surface((int(bord.Screen.breedte), int(bord.Screen.hoogte)), pygame.SRCALPHA)
     pygame.draw.rect(blurr, (255, 255, 255, 200), blurr.get_rect())
@@ -113,10 +115,14 @@ def pause_menu():
                 pygame.mixer.music.pause()
                 geluid.dobb_eff.set_volume(0)
                 geluid.move_eff.set_volume(0)
+                geluid.get_rent.set_volume(0)
+                geluid.pay_rent.set_volume(0)
             if unmute_knop_rect.collidepoint(event.pos):
                 pygame.mixer.music.unpause()
                 geluid.dobb_eff.set_volume(1)
                 geluid.move_eff.set_volume(1)
+                geluid.get_rent.set_volume(1)
+                geluid.pay_rent.set_volume(1)
     bord.Screen.screen.blit(font.render("EXIT", True,(230,230,230)), exit_knop_rect)
     bord.Screen.screen.blit(font.render("CONTINUE", True,(230,230,230)), continue_knop_rect)
     bord.Screen.screen.blit(big_font.render("PAUSE", True, (10,10,10)), (600,0))
@@ -136,4 +142,23 @@ def player_mode():
     bord.Screen.screen.blit(font.render("PVP", True, (10,10,10)), (850,350))
     bord.Screen.screen.blit(font.render("bot", True, (10,10,10)), (850,500))
     pygame.display.flip()
+    return
+replay_knop = pygame.Rect(700,600,200,100)
+def end_screen_win():
+    blurr = pygame.Surface((1920, 1080), pygame.SRCALPHA)
+    pygame.draw.rect(blurr, (0, 50, 0, 200), blurr.get_rect())
+    bord.Screen.screen.blit(blurr, (0,0))
+    bord.Screen.screen.blit(moneypolie, (500,10))#blit de logo
+    bord.Screen.screen.blit(big_font.render("YOU WON!", True, (10,10,10)), (550,350))
+    pygame.draw.rect(bord.Screen.screen, (230,100,100), replay_knop)
+    bord.Screen.screen.blit(font.render("Replay", True, (10,10,10)), replay_knop)
+    return
+def end_screen_loss():
+    blurr = pygame.Surface((1920, 1080), pygame.SRCALPHA)
+    pygame.draw.rect(blurr, (0, 50, 0, 200), blurr.get_rect())
+    bord.Screen.screen.blit(blurr, (0,0))
+    bord.Screen.screen.blit(moneypolie, (500,10))#blit de logo
+    bord.Screen.screen.blit(big_font.render("YOU LOST!", True, (10,10,10)), (550,350))
+    pygame.draw.rect(bord.Screen.screen, (230,100,100), replay_knop)
+    bord.Screen.screen.blit(font.render("Replay", True, (10,10,10)), replay_knop)
     return
