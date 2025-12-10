@@ -13,7 +13,7 @@ def bot_game():
     print(data)
 
     def dobbelsteen():
-        dobb = random.randint(1,2)
+        dobb = random.randint(1,5)
         return dobb
     #stat text render
     font = pygame.font.SysFont("Tahoma", 30)
@@ -106,8 +106,12 @@ def bot_game():
                     resterende_vakken -= (vakken_tot_hoek + 1)
     def teken_alles():
         for i in range(0, 10, 9):#witte hoeken
-            pygame.draw.rect(bord.Screen.screen, (255, 255, 255), (80*i+75,130,80,90))
+            pygame.draw.rect(bord.Screen.screen, (255, 255, 255), (80*i+75,130,80,90)) #1ste: x=75 en y=130 2de: x=795 en y= 130
             pygame.draw.rect(bord.Screen.screen, (255, 255, 255), (80*i+75,580,80,90))
+            bord.Screen.screen.blit(UI.go_to_jail_, (75,130))
+            bord.Screen.screen.blit(UI.font.render("START", True, (10,10,10)), (795,130))
+            bord.Screen.screen.blit(UI.jail, (795, 580))
+            bord.Screen.screen.blit(UI.parking, (75,580))
             pygame.draw.rect(bord.Screen.screen, (0, 0, 0), (80*i+75,130,80,90), 1)
             pygame.draw.rect(bord.Screen.screen, (0, 0, 0), (80*i+75,580,80,90), 1)
         
@@ -147,6 +151,12 @@ def bot_game():
         bord.Screen.screen.blit(font.render(f"Eigendommen: {posities["speler"]["eigendom"]}", True, (230,230,230)), (200,270))
         bord.Screen.screen.blit(font.render(f"Budget bot: {posities["bot"]["budget"]}", True, (230,230,230)), (200, 320))
         bord.Screen.screen.blit(font.render(f"Eigendommen bot: {posities["bot"]["eigendom"]}", True, (230,230,230)), (200,370))
+        
+        if gevangen_beurten["speler"] > 0:
+            bord.Screen.screen.blit(font.render(f"GEVANGENIS: {gevangen_beurten['speler']} beurten", True, (255, 50, 50)), (200, 420))
+        if gevangen_beurten["bot"] > 0:
+            bord.Screen.screen.blit(font.render(f"BOT GEVANGENIS: {gevangen_beurten['bot']} beurten", True, (255, 50, 50)), (200, 470))
+        
         for pos in owned_pos_speler:
             bord.Screen.screen.blit(UI.speler_owned, (pos["x"], pos["y"]))
 
@@ -239,12 +249,52 @@ def bot_game():
                 else:
                     # Geen eigendommen meer - failliet
                     game_state = "game_over_speler_wint"
-    
+    upgrade_knop = pygame.Rect(900,500,200,100)
+    def upgrade_mechanism():
+        nonlocal i
+        pygame.draw.rect(bord.Screen.screen, (50,100,200), upgrade_knop)
+        bord.Screen.screen.blit(UI.font.render("UPGRADE", True, (10,10,10)), upgrade_knop)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if upgrade_knop.collidepoint(event.pos) and i < 1:
+                if posities[huidige]["budget"] >= 100:
+                    vak["huur"] += 10
+                    posities[huidige]["budget"] -= 100
+                    if huidige == "speler": geluid.player_upgrade.play()    
+                    i+=1
+                    
+                else:
+                    bord.Screen.screen.blit(font.render("Niet genoeg geld!", True, (230,230,230)), (910, 590))
+    i=0 #dit zorg dat de huur_mechanisme() maar 1 keer word uitgevoerd
+    # Na posities = {...}
+    speciale_vakken = {
+        "ga_naar_gevangenis": {"x": 75, "y": 130},  
+        "gevangenis": {"x": 795, "y": 580}
+    }
+
+    gevangen_beurten = {
+        "speler": 0,
+        "bot": 0
+    }
+
+    def check_speciale_vakken():
+        nonlocal gevangen_beurten
+        # Check "ga naar gevangenis" vak
+        if (posities[huidige]["x"] == speciale_vakken["ga_naar_gevangenis"]["x"] and 
+            posities[huidige]["y"] == speciale_vakken["ga_naar_gevangenis"]["y"]):
+            
+            print(f"{huidige} landt op 'Ga naar Gevangenis'!")
+            
+            # Teleporteer direct
+            posities[huidige]["x"] = speciale_vakken["gevangenis"]["x"]
+            posities[huidige]["y"] = speciale_vakken["gevangenis"]["y"]
+            posities[huidige]["straat"] = "rood"
+            
+            gevangen_beurten[huidige] = 3
+            print(f"{huidige} zit 3 beurten vast!")
     posities = {
         "speler": {"x": 795, "y": 130, 'straat' : 'geel', "budget": 1500, "eigendom": 0},
         "bot": {"x": 795, "y": 130, 'straat' : 'geel', "budget": 1500, "eigendom": 0}
     }
-    i=0 #dit zorg dat de huur_mechanisme() maar 1 keer word uitgevoerd
     clock = pygame.time.Clock()
     paused = False
     running = True
@@ -256,6 +306,9 @@ def bot_game():
         # Check game state voor game over schermen
         if game_state == "game_over_bot_wint":
             # Teken game over scherm
+            if i < 1:
+                geluid.player_los.play()
+                i+=1
             UI.end_screen_loss()
             # Check voor exit
             for event in pygame.event.get():
@@ -268,10 +321,15 @@ def bot_game():
                         # Reset alles
                         game_state = "playing"
                         beurt_num = 1
-                        posities["speler"] = {"x": 795, "y": 130, 'straat': 'geel', "budget": 500, "eigendom": 0}
-                        posities["bot"] = {"x": 795, "y": 130, 'straat': 'geel', "budget": 500, "eigendom": 0}
+                        posities["speler"] = {"x": 795, "y": 130, 'straat': 'geel', "budget": 1500, "eigendom": 0} #reset de stats
+                        posities["bot"] = {"x": 795, "y": 130, 'straat': 'geel', "budget": 1500, "eigendom": 0}
                         owned_pos_speler.clear()
                         owned_pos_bot.clear()
+                        gevangen_beurten["speler"] = 0
+                        gevangen_beurten["bot"] = 0
+                        for straat in data.values():
+                            for vak in straat:
+                                vak["eigenaar"] = None
             
             pygame.display.flip()
             clock.tick(60)
@@ -279,6 +337,9 @@ def bot_game():
         
         elif game_state == "game_over_speler_wint":
             # Teken win scherm
+            if i< 1:
+                geluid.player_win.play()
+                i+=1
             UI.end_screen_win()# Check voor exit
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -290,10 +351,15 @@ def bot_game():
                         # Reset alles
                         game_state = "playing"
                         beurt_num = 1
-                        posities["speler"] = {"x": 795, "y": 130, 'straat': 'geel', "budget": 500, "eigendom": 0}
-                        posities["bot"] = {"x": 795, "y": 130, 'straat': 'geel', "budget": 500, "eigendom": 0}
+                        posities["speler"] = {"x": 795, "y": 130, 'straat': 'geel', "budget": 1500, "eigendom": 0}
+                        posities["bot"] = {"x": 795, "y": 130, 'straat': 'geel', "budget": 1500, "eigendom": 0}
                         owned_pos_speler.clear()
                         owned_pos_bot.clear()
+                        gevangen_beurten["speler"] = 0
+                        gevangen_beurten["bot"] = 0
+                        for straat in data.values():
+                            for vak in straat:
+                                vak["eigenaar"] = None
             
             pygame.display.flip()
             clock.tick(60)
@@ -310,10 +376,13 @@ def bot_game():
                     if huidige == "speler":  # alleen speler ziet koop knop
                         koop_mechanisme()
                 
+                elif vak["eigenaar"] == "speler":
+                    upgrade_mechanism()                   
                 # check huur betaling
                 elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
                     huur_mechanisme(huidige, vak["eigenaar"], vak)
                     i+=1
+                
                     
         for vak in data['geel']:
             if posities[huidige]["y"] == vak["y"] and posities[huidige]['straat'] == 'geel':
@@ -324,6 +393,9 @@ def bot_game():
                 if vak["eigenaar"] is None:
                     if huidige == "speler":
                         koop_mechanisme()
+                
+                elif vak["eigenaar"] == "speler":
+                    upgrade_mechanism()
                 
                 # check huur betaling
                 elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
@@ -340,6 +412,9 @@ def bot_game():
                     if huidige == "speler":
                         koop_mechanisme()
                 
+                elif vak["eigenaar"] == "speler":
+                    upgrade_mechanism()
+
                 # check huur betaling
                 elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
                     huur_mechanisme(huidige, vak["eigenaar"], vak)
@@ -355,6 +430,9 @@ def bot_game():
                     if huidige == "speler":
                         koop_mechanisme()
                 
+                elif vak["eigenaar"] == "speler":
+                    upgrade_mechanism()
+
                 # check huur betaling
                 elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
                     huur_mechanisme(huidige, vak["eigenaar"], vak)
@@ -371,68 +449,88 @@ def bot_game():
                     paused = not paused  # toggle pauze status
                 elif not paused and huidige == "speler":  # alleen andere knoppen als niet gepauzeerd
                     if gooi_knop.collidepoint(event.pos):
-                        dobb1=dobbelsteen()
-                        dobb2=dobbelsteen()
-                        geluid.dobb_eff.play()
-                        geluid.move_eff.play()
-                        dob_tot = dobb1 + dobb2
-                        vakken_opgeschoven = dob_tot #moet spitsen naar x en y en in loop toevoegen
-                        print(huidige)
-                        print(beurt_num)
-                        #speler beweegt langs gele straat
-                        move_logica()
-                        i=0
-                        beurt_num +=1
+                        # SPELER BEURT 
+                        if gevangen_beurten["speler"] > 0:
+                            gevangen_beurten["speler"] -= 1
+                            print(f"Speler zit nog {gevangen_beurten['speler']} beurten gevangen")
+                            beurt_num += 1
+                        else:
+                            dobb1 = dobbelsteen()
+                            dobb2 = dobbelsteen()
+                            geluid.dobb_eff.play()
+                            geluid.move_eff.play()
+                            dob_tot = dobb1 + dobb2
+                            vakken_opgeschoven = dob_tot
+                            print(huidige)
+                            print(beurt_num)
+                            move_logica()
+                            check_speciale_vakken()
+                            i = 0
+                            beurt_num += 1
+                        
                         teken_alles()
                         pygame.draw.rect(bord.Screen.screen, (20,20,20), (950, 100, 100,100))
                         pygame.display.flip()
                         pygame.time.wait(1000)
 
+                        # BOT BEURT
                         huidige = "bot"
-                        dobb1=dobbelsteen()
-                        dobb2=dobbelsteen()
-                        geluid.dobb_eff.play()
-                        geluid.move_eff.play()
-                        dob_tot = dobb1 + dobb2
-                        vakken_opgeschoven = dob_tot #moet spitsen naar x en y en in loop toevoegen
-                        print(huidige)
-                        print(beurt_num)
-                        #speler beweegt langs gele straat
-                        move_logica()
-                        i=0
+                        if gevangen_beurten["bot"] > 0:
+                            gevangen_beurten["bot"] -= 1
+                            print(f"Bot zit nog {gevangen_beurten['bot']} beurten gevangen")
+                            beurt_num += 1
+                        else:
+                            dobb1 = dobbelsteen()
+                            dobb2 = dobbelsteen()
+                            geluid.dobb_eff.play()
+                            geluid.move_eff.play()
+                            dob_tot = dobb1 + dobb2
+                            vakken_opgeschoven = dob_tot
+                            print(huidige)
+                            print(beurt_num)
                         
-                        for vak in data[posities["bot"]["straat"]]:
-                            if posities["bot"]["straat"] == "rood" or posities["bot"]["straat"] == "blauw":
-                                if posities["bot"]["x"] == vak["x"]:
-                                    if vak["eigenaar"] is None:
-                                        if posities["bot"]["budget"] > vak["prijs"]:
-                                            vak["eigenaar"] = "bot"
-                                            posities["bot"]["budget"] -= vak["prijs"]
-                                            posities["bot"]["eigendom"] += vak["prijs"]
-                                            owned_pos_bot.append({"x" : posities["bot"]["x"], "y": posities["bot"]["y"], "waarde": vak["prijs"]})
+                            move_logica()  # ← hier beweegt bot
+                            check_speciale_vakken()  # ← check of bot op speciaal vak staat
+                            if posities["bot"]["straat"] in data:  # ← voeg deze check toe
+                                for vak in data[posities["bot"]["straat"]]:
+                                    if posities["bot"]["straat"] == "rood" or posities["bot"]["straat"] == "blauw":
+                                        if posities["bot"]["x"] == vak["x"]:
+                                            if vak["eigenaar"] is None:
+                                                if posities["bot"]["budget"] > vak["prijs"]:
+                                                    vak["eigenaar"] = "bot"
+                                                    posities["bot"]["budget"] -= vak["prijs"]
+                                                    posities["bot"]["eigendom"] += vak["prijs"]
+                                                    owned_pos_bot.append({"x": posities["bot"]["x"], "y": posities["bot"]["y"], "waarde": vak["prijs"]})
 
-                            elif posities["bot"]["straat"] == "geel" or posities["bot"]["straat"] == "groen":
-                                if posities["bot"]["y"] == vak["y"]:
-                                    if vak["eigenaar"] is None:
-                                        if posities["bot"]["budget"] > vak["prijs"]:
-                                            vak["eigenaar"] = "bot"
-                                            posities["bot"]["budget"] -= vak["prijs"]
-                                            posities["bot"]["eigendom"] += vak["prijs"]
-                                            owned_pos_bot.append({"x" : posities["bot"]["x"], "y": posities["bot"]["y"], "waarde": vak["prijs"]})
+                                    elif posities["bot"]["straat"] == "geel" or posities["bot"]["straat"] == "groen":
+                                        if posities["bot"]["y"] == vak["y"]:
+                                            if vak["eigenaar"] is None:
+                                                if posities["bot"]["budget"] > vak["prijs"]:
+                                                    vak["eigenaar"] = "bot"
+                                                    posities["bot"]["budget"] -= vak["prijs"]
+                                                    posities["bot"]["eigendom"] += vak["prijs"]
+                                                    owned_pos_bot.append({"x": posities["bot"]["x"], "y": posities["bot"]["y"], "waarde": vak["prijs"]})
 
-                        for vak in data[posities["bot"]["straat"]]:
-                            op_vak = False
+                                # Bot huur en upgrade check
+                                for vak in data[posities["bot"]["straat"]]:
+                                    op_vak = False
+                                
+                                    if posities["bot"]["straat"] in ["rood", "blauw"]:
+                                        op_vak = (posities["bot"]["x"] == vak["x"])
+                                    elif posities["bot"]["straat"] in ["geel", "groen"]:
+                                        op_vak = (posities["bot"]["y"] == vak["y"])
+                                
+                                    if op_vak and vak["eigenaar"] == "speler":
+                                        huur_mechanisme("bot", "speler", vak)
+                                        break
+                                    elif op_vak and vak["eigenaar"] == "bot":
+                                        upgrade_mechanism()
+                                        geluid.bot_upgtade.play()
+                                        print("bot upgrade")
+                                        break
                             
-                            if posities["bot"]["straat"] in ["rood", "blauw"]:
-                                op_vak = (posities["bot"]["x"] == vak["x"])
-                            elif posities["bot"]["straat"] in ["geel", "groen"]:
-                                op_vak = (posities["bot"]["y"] == vak["y"])
-                            
-                            if op_vak and vak["eigenaar"] == "speler":
-                                huur_mechanisme("bot", "speler", vak)
-                                break
-                        beurt_num += 1
-                    # print(speler_pos)
+                            beurt_num += 1  # ← voeg dit toe na bot zet
+                        i = 0  # ← reset i
                 elif paused:  # check pauze menu knoppen
                     if UI.exit_knop_rect.collidepoint(event.pos):
                         pygame.quit()

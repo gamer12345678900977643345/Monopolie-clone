@@ -19,3 +19,11 @@ pygame.mixer.music.set_volume(5)
 
 pay_rent = pygame.mixer.Sound("assets/rent betalen.mp3")
 pygame.mixer.music.set_volume(5)
+
+player_win = pygame.mixer.Sound("assets/win sound.mp3")
+
+player_los = pygame.mixer.Sound("assets/loss sound.mp3")
+
+player_upgrade = pygame.mixer.Sound("assets/level up.mp3")
+
+bot_upgtade = pygame.mixer.Sound("assets/level up bot.mp3")
