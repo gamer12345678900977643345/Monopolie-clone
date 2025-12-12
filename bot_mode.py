@@ -5,6 +5,7 @@ import json
 import random
 import UI
 import geluid
+import effecten
 pygame.init()
 def bot_game():
     tile_ID = "tileID.json"
@@ -461,6 +462,11 @@ def bot_game():
                             geluid.move_eff.play()
                             dob_tot = dobb1 + dobb2
                             vakken_opgeschoven = dob_tot
+                            if dobb1 == dobb2:
+                                print(f"BOT DUBBEL! {dobb1} en {dobb2}")
+                                effect_num, effect_naam, vakken_beweging = effecten.random_effecten(huidige, posities, gevangen_beurten, owned_pos_speler, owned_pos_bot, 
+                                        speciale_vakken, font, bord)
+                                teken_alles() 
                             print(huidige)
                             print(beurt_num)
                             move_logica()
@@ -485,6 +491,11 @@ def bot_game():
                             geluid.dobb_eff.play()
                             geluid.move_eff.play()
                             dob_tot = dobb1 + dobb2
+                            if dobb1 == dobb2:
+                                print(f"BOT DUBBEL! {dobb1} en {dobb2}")
+                                effect_num, effect_naam, vakken_beweging = effecten.random_effecten(huidige, posities, gevangen_beurten, owned_pos_speler, owned_pos_bot, 
+                                        speciale_vakken, font, bord)
+                                teken_alles()
                             vakken_opgeschoven = dob_tot
                             print(huidige)
                             print(beurt_num)
