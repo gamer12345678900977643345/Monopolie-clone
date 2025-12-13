@@ -13,7 +13,7 @@ def bot_game():
     tile_ID = "tileID.json"
     with open(tile_ID, 'r') as json_file:
         data = json.load(json_file)
-    print(data)
+    # print(data)
 
     def dobbelsteen():
         dobb = random.randint(1,5)
@@ -37,7 +37,7 @@ def bot_game():
     game_state = "playing"  # nieuwe variabele voor game state
     geluid.background()
     
-    upgrade_knop = pygame.Rect(900,500,200,100)
+    
     
     i=0 #dit zorg dat de huur_mechanisme() maar 1 keer word uitgevoerd
     game_over_sound_played = False  # Aparte variabele voor game over geluid
@@ -71,6 +71,7 @@ def bot_game():
         "speler": {"x": 795, "y": 130, 'straat' : 'geel', "budget": 1500, "eigendom": 0},
         "bot": {"x": 795, "y": 130, 'straat' : 'geel', "budget": 1500, "eigendom": 0}
     }
+    upgrade_knop = pygame.Rect(900,500,200,100)
     clock = pygame.time.Clock()
     paused = False
     running = True
@@ -157,7 +158,7 @@ def bot_game():
                         logic.koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak)
                 
                 elif vak["eigenaar"] == "speler":
-                    i = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI)                   
+                    i = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot)                   
                 # check huur betaling
                 elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
                     i, game_state = logic.huur_mechanisme(i, huidige, vak["eigenaar"], vak, posities, owned_pos_speler, owned_pos_bot, data, geluid)
@@ -174,7 +175,7 @@ def bot_game():
                         logic.koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak)
                 
                 elif vak["eigenaar"] == "speler":
-                    i = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI)
+                    i = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot)
                 
                 # check huur betaling
                 elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
@@ -191,7 +192,7 @@ def bot_game():
                         logic.koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak)
                 
                 elif vak["eigenaar"] == "speler":
-                    i = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI)
+                    i = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot)
 
                 # check huur betaling
                 elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
@@ -208,7 +209,7 @@ def bot_game():
                         logic.koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak)
                 
                 elif vak["eigenaar"] == "speler":
-                    i = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI)
+                    i = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot)
 
                 # check huur betaling
                 elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
@@ -245,8 +246,8 @@ def bot_game():
                                 effect_num, effect_naam, vakken_beweging = effecten.random_effecten(huidige, posities, gevangen_beurten, owned_pos_speler, owned_pos_bot, 
                                         speciale_vakken, font, bord)
                                 render.teken_alles(bord, posities, owned_pos_speler, owned_pos_bot, gevangen_beurten, paused, UI, clock) 
-                            print(huidige)
-                            print(beurt_num)
+                            # print(huidige)
+                            # print(beurt_num)
                             logic.move_logica(vakken_opgeschoven, posities, huidige, render, bord, owned_pos_speler, owned_pos_bot, gevangen_beurten, paused, UI, clock)
                             check_speciale_vakken()
                             beurt_num += 1
@@ -277,8 +278,8 @@ def bot_game():
                                         speciale_vakken, font, bord)
                                 render.teken_alles(bord, posities, owned_pos_speler, owned_pos_bot, gevangen_beurten, paused, UI, clock)
                             vakken_opgeschoven = dob_tot
-                            print(huidige)
-                            print(beurt_num)
+                            # print(huidige)
+                            # print(beurt_num)
                         
                             logic.move_logica(vakken_opgeschoven, posities, huidige, render, bord, owned_pos_speler, owned_pos_bot, gevangen_beurten, paused, UI, clock)  # ← hier beweegt bot
                             check_speciale_vakken()  # ← check of bot op speciaal vak staat
@@ -302,7 +303,7 @@ def bot_game():
                                         
                                         # Bot upgrade
                                         elif vak["eigenaar"] == "bot" and i < 1:
-                                            i = logic.bot_upgrade(i, posities, vak, geluid)
+                                            i = logic.bot_upgrade(i, posities, vak, geluid, owned_pos_bot)
                                             break
                             
                             beurt_num += 1  # ← voeg dit toe na bot zet

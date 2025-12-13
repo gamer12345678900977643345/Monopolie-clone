@@ -4,8 +4,8 @@ def koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, fo
     koop_knop = pygame.draw.rect(bord.Screen.screen, (200,200,100), (900, 450,300,60))
     pygame.draw.rect(bord.Screen.screen, (80,20,20), (900, 450,300,60),5)
     bord.Screen.screen.blit(font.render("Koop nu", True, (230,230,230)), (910,460))
-    print(f"bot: {owned_pos_bot}")
-    print(f"speler: {owned_pos_speler}")
+    # print(f"bot: {owned_pos_bot}")
+    # print(f"speler: {owned_pos_speler}")
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONDOWN:
             if koop_knop.collidepoint(event.pos):
@@ -13,7 +13,7 @@ def koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, fo
                     vak["eigenaar"] = huidige
                     posities[huidige]["budget"] -= vak["prijs"]
                     posities[huidige]["eigendom"] += vak["prijs"]
-                    owned_pos_speler.append({"x": posities["speler"]["x"], "y": posities["speler"]["y"], "waarde": vak["prijs"]})
+                    owned_pos_speler.append({"x": posities["speler"]["x"], "y": posities["speler"]["y"], "waarde": vak["prijs"], "level": vak["level"]})
                 else:
                     bord.Screen.screen.blit(font.render("Niet genoeg geld!", True, (230,230,230)), (1200,250))
                     print("you broke!")
@@ -72,18 +72,27 @@ def move_logica(vakken_opgeschoven, posities, huidige, render, bord, owned_pos_s
     
     render.teken_alles(bord, posities, owned_pos_speler, owned_pos_bot, gevangen_beurten, paused, UI, clock)
 
-def upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI):
+def upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot):
     """Returns updated i value"""
     pygame.draw.rect(bord.Screen.screen, (50,100,200), upgrade_knop)
     bord.Screen.screen.blit(UI.font.render("UPGRADE", True, (10,10,10)), upgrade_knop)
+    pygame.draw.rect(bord.Screen.screen, (10,10,10), upgrade_knop, 2)
     
     if event.type == pygame.MOUSEBUTTONDOWN:
         if upgrade_knop.collidepoint(event.pos) and i < 1:
             if posities[huidige]["budget"] >= 100:
                 vak["huur"] += 10
+                vak["level"] += 1  # Verhoog upgrade level
                 posities[huidige]["budget"] -= 100
-                if huidige == "speler": 
-                    geluid.player_upgrade.play()    
+                
+                # Update level in owned_pos lijst
+                if huidige == "speler":
+                    geluid.player_upgrade.play()
+                    for pos in owned_pos_speler:
+                        if pos["x"] == posities["speler"]["x"] and pos["y"] == posities["speler"]["y"]:
+                            pos["level"] = vak["level"]
+                            break
+                    
                 i = 1
             else:
                 bord.Screen.screen.blit(font.render("Niet genoeg geld!", True, (230,230,230)), (910, 590))
@@ -169,13 +178,21 @@ def huur_mechanisme(i, betaler, ontvanger, vak, posities, owned_pos_speler, owne
     
     return (1, game_state)
 
-def bot_upgrade(i, posities, vak, geluid):
+def bot_upgrade(i, posities, vak, geluid, owned_pos_bot):
     """Bot upgrade logica - returns updated i"""
     if i < 1 and posities["bot"]["budget"] >= 100:
         vak["huur"] += 10
+        vak["level"] += 1  # Verhoog upgrade level
         posities["bot"]["budget"] -= 100
+        
+        # Update level in owned_pos_bot lijst
+        for pos in owned_pos_bot:
+            if pos["x"] == posities["bot"]["x"] and pos["y"] == posities["bot"]["y"]:
+                pos["level"] = vak["level"]
+                break
+        
         geluid.bot_upgtade.play()
-        print("bot upgrade")
+        print(f"bot upgrade - level {vak['level']}")
         return 1
     return i
 
@@ -188,5 +205,6 @@ def bot_koop(posities, vak, owned_pos_bot):
         owned_pos_bot.append({
             "x": posities["bot"]["x"], 
             "y": posities["bot"]["y"], 
-            "waarde": vak["prijs"]
+            "waarde": vak["prijs"],
+            "level": vak["level"]
         })

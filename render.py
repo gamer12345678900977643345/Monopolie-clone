@@ -57,9 +57,15 @@ def teken_alles(bord, posities, owned_pos_speler, owned_pos_bot, gevangen_beurte
     
     for pos in owned_pos_speler:
         bord.Screen.screen.blit(UI.speler_owned, (pos["x"], pos["y"]))
+        # Teken level als het bestaat
+        if "level" in pos and pos["level"] > 0:
+            bord.Screen.screen.blit(UI.small_font.render(str(pos["level"]), True, (255,255,255)), (pos["x"] + 14, pos["y"] + 9))
 
     for pos in owned_pos_bot:
         bord.Screen.screen.blit(UI.bot_owned, (pos["x"], pos["y"]))
+        # Teken level als het bestaat
+        if "level" in pos and pos["level"] > 0:
+            bord.Screen.screen.blit(UI.small_font.render(str(pos["level"]), True, (255,255,255)), (pos["x"] + 14, pos["y"] + 9))
     
     # teken pauze menu als gepauzeerd
     if paused:
@@ -70,3 +76,8 @@ def teken_alles(bord, posities, owned_pos_speler, owned_pos_bot, gevangen_beurte
     
     pygame.display.flip()
     clock.tick(60)
+# def animatie():
+#     player_0 = pygame.image.load("assets/player0.png").convert_alpha()
+#     bot0 = pygame.image.load("assets/player1.png").convert_alpha()
+
+#     return
