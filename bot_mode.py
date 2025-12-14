@@ -13,8 +13,7 @@ def bot_game():
     tile_ID = "tileID.json"
     with open(tile_ID, 'r') as json_file:
         data = json.load(json_file)
-    dobbelsteen_choose = True
-    dob_keus = 6  # Default waarde (BELANGRIJK: moet bestaan voordat while loop start)
+        dobbelsteen_choose = True
     while dobbelsteen_choose == True:
         UI.dobbelsteen_kies()
         for event in pygame.event.get():
@@ -24,13 +23,13 @@ def bot_game():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if UI.d4_rect.collidepoint(event.pos):
                     dob_keus = 4
-                    dobbelsteen_choose = False
+                    dobbelsteen_choose =False
                 if UI.d6_rect.collidepoint(event.pos):
                     dob_keus = 6
-                    dobbelsteen_choose = False
+                    dobbelsteen_choose =False
                 if UI.d8_rect.collidepoint(event.pos):
                     dob_keus = 8
-                    dobbelsteen_choose = False
+                    dobbelsteen_choose =False
     #stat text render
     font = pygame.font.SysFont("Tahoma", 30)
     def info_screen():
@@ -126,7 +125,6 @@ def bot_game():
                         for straat in data.values():
                             for vak in straat:
                                 vak["eigenaar"] = None
-                                vak["level"] = 1  # Reset level ook
             
             pygame.display.flip()
             clock.tick(60)
@@ -159,82 +157,81 @@ def bot_game():
                         for straat in data.values():
                             for vak in straat:
                                 vak["eigenaar"] = None
-                                vak["level"] = 1  # Reset level ook
             
             pygame.display.flip()
             clock.tick(60)
             continue  # skip rest van loop
         
+        #tile info check
+        for vak in data['rood']:
+            if posities[huidige]["x"] == vak["x"] and posities[huidige]['straat'] == 'rood':
+                # teken het info vak
+                info_screen()
+                
+                # koop-knop tonen als geen eigenaar
+                if vak["eigenaar"] is None:
+                    if huidige == "speler":  # alleen speler ziet koop knop
+                        message_text, message_color, message_timer =logic.koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak, message_text, message_color, message_timer)
+                    
+                elif vak["eigenaar"] == "speler":
+                    i, message_text, message_color, message_timer = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot, message_text, message_color, message_timer)                   
+                # check huur betaling
+                elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
+                    i, game_state = logic.huur_mechanisme(i, huidige, vak["eigenaar"], vak, posities, owned_pos_speler, owned_pos_bot, data, geluid)
+                
+                    
+        for vak in data['geel']:
+            if posities[huidige]["y"] == vak["y"] and posities[huidige]['straat'] == 'geel':
+                # teken het info vak
+                info_screen()
+                
+                # koop-knop tonen als geen eigenaar
+                if vak["eigenaar"] is None:
+                    if huidige == "speler":
+                        message_text, message_color, message_timer =logic.koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak, message_text, message_color, message_timer)
+                    
+                elif vak["eigenaar"] == "speler":
+                    i, message_text, message_color, message_timer = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot, message_text, message_color, message_timer)
+                
+                # check huur betaling
+                elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
+                    i, game_state = logic.huur_mechanisme(i, huidige, vak["eigenaar"], vak, posities, owned_pos_speler, owned_pos_bot, data, geluid)
+
+        for vak in data['groen']:
+            if posities[huidige]["y"] == vak["y"] and posities[huidige]['straat'] == 'groen':
+                # teken het info vak
+                info_screen()
+                
+                # koop-knop tonen als geen eigenaar
+                if vak["eigenaar"] is None:
+                    if huidige == "speler":
+                        message_text, message_color, message_timer = logic.koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak, message_text, message_color, message_timer)
+                        
+                elif vak["eigenaar"] == "speler":
+                    i, message_text, message_color, message_timer = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot, message_text, message_color, message_timer)
+
+                # check huur betaling
+                elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
+                    i, game_state = logic.huur_mechanisme(i, huidige, vak["eigenaar"], vak, posities, owned_pos_speler, owned_pos_bot, data, geluid)
+
+        for vak in data['blauw']:
+            if posities[huidige]["x"] == vak["x"] and posities[huidige]['straat'] == 'blauw':
+                # teken het info vak
+                info_screen()
+                
+                # koop-knop tonen als geen eigenaar
+                if vak["eigenaar"] is None:
+                    if huidige == "speler":
+                        message_text, message_color, message_timer = logic.koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak, message_text, message_color, message_timer)
+
+                elif vak["eigenaar"] == "speler":
+                    i, message_text, message_color, message_timer = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot, message_text, message_color, message_timer)
+
+                # check huur betaling
+                elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
+                    i, game_state = logic.huur_mechanisme(i, huidige, vak["eigenaar"], vak, posities, owned_pos_speler, owned_pos_bot, data, geluid)
+
         for event in pygame.event.get():
-            #tile info check (VERPLAATST BINNEN EVENT LOOP voor upgrade_mechanism)
-            for vak in data['rood']:
-                if posities[huidige]["x"] == vak["x"] and posities[huidige]['straat'] == 'rood':
-                    # teken het info vak
-                    info_screen()
-                    
-                    # koop-knop tonen als geen eigenaar
-                    if vak["eigenaar"] is None:
-                        if huidige == "speler":  # alleen speler ziet koop knop
-                            message_text, message_color, message_timer = logic.koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak, message_text, message_color, message_timer)
-                        
-                    elif vak["eigenaar"] == "speler":
-                        i, message_text, message_color, message_timer = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot, message_text, message_color, message_timer)                   
-                    # check huur betaling
-                    elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
-                        i, game_state = logic.huur_mechanisme(i, huidige, vak["eigenaar"], vak, posities, owned_pos_speler, owned_pos_bot, data, geluid)
-                    
-                        
-            for vak in data['geel']:
-                if posities[huidige]["y"] == vak["y"] and posities[huidige]['straat'] == 'geel':
-                    # teken het info vak
-                    info_screen()
-                    
-                    # koop-knop tonen als geen eigenaar
-                    if vak["eigenaar"] is None:
-                        if huidige == "speler":
-                            message_text, message_color, message_timer = logic.koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak, message_text, message_color, message_timer)
-                        
-                    elif vak["eigenaar"] == "speler":
-                        i, message_text, message_color, message_timer = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot, message_text, message_color, message_timer)
-                    
-                    # check huur betaling
-                    elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
-                        i, game_state = logic.huur_mechanisme(i, huidige, vak["eigenaar"], vak, posities, owned_pos_speler, owned_pos_bot, data, geluid)
-
-            for vak in data['groen']:
-                if posities[huidige]["y"] == vak["y"] and posities[huidige]['straat'] == 'groen':
-                    # teken het info vak
-                    info_screen()
-                    
-                    # koop-knop tonen als geen eigenaar
-                    if vak["eigenaar"] is None:
-                        if huidige == "speler":
-                            message_text, message_color, message_timer = logic.koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak, message_text, message_color, message_timer)
-                            
-                    elif vak["eigenaar"] == "speler":
-                        i, message_text, message_color, message_timer = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot, message_text, message_color, message_timer)
-
-                    # check huur betaling
-                    elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
-                        i, game_state = logic.huur_mechanisme(i, huidige, vak["eigenaar"], vak, posities, owned_pos_speler, owned_pos_bot, data, geluid)
-
-            for vak in data['blauw']:
-                if posities[huidige]["x"] == vak["x"] and posities[huidige]['straat'] == 'blauw':
-                    # teken het info vak
-                    info_screen()
-                    
-                    # koop-knop tonen als geen eigenaar
-                    if vak["eigenaar"] is None:
-                        if huidige == "speler":
-                            message_text, message_color, message_timer = logic.koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak, message_text, message_color, message_timer)
-
-                    elif vak["eigenaar"] == "speler":
-                        i, message_text, message_color, message_timer = logic.upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot, message_text, message_color, message_timer)
-
-                    # check huur betaling
-                    elif vak["eigenaar"] is not None and vak["eigenaar"] != huidige and i < 1:
-                        i, game_state = logic.huur_mechanisme(i, huidige, vak["eigenaar"], vak, posities, owned_pos_speler, owned_pos_bot, data, geluid)
-
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
@@ -344,12 +341,6 @@ def bot_game():
 
         # print(f"budget speler: {"speler"}, budget bot: {"bot"}, huur: {posities}")
 
-        # Teken bericht als timer actief is (AAN HET EINDE)
-        if message_timer > 0:
-            bord.Screen.screen.blit(font.render(message_text, True, message_color), (500, 220))
-            message_timer -= 1
-
         render.teken_alles(bord, posities, owned_pos_speler, owned_pos_bot, gevangen_beurten, paused, UI, clock)
-        # logic.check_budget(posities, owned_pos_speler, owned_pos_bot, vak)  # VERWIJDERD: 'vak' bestaat niet hier
+        logic.check_budget(posities, owned_pos_speler, owned_pos_bot,vak) #ik weet niet hoe ik dit moet testen
         pygame.display.flip()
-        clock.tick(60)  # Voeg clock.tick toe voor frame limiet
