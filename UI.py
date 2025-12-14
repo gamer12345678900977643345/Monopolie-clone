@@ -21,6 +21,21 @@ d8 = pygame.transform.scale_by(pygame.image.load("assets/D8.png").convert_alpha(
 d4_rect = pygame.Rect(400,400, 200,200)
 d6_rect = pygame.Rect(600,400, 200,200)
 d8_rect = pygame.Rect(800,400, 200,200)
+dice_img= {}
+for i in range(1,5):
+    dice= pygame.image.load(f"assets/D4-{i}.png").convert_alpha()
+    dice_img[('D4', i)] = dice
+    print(dice_img)
+
+for i in range(1,7):
+    dice = pygame.image.load(f"assets/D6-{i}.png").convert_alpha()
+    dice_img[('D6', i)] = dice
+    print(dice_img)
+
+for i in range(1,9):
+    dice = pygame.image.load(f"assets/D8-{i}.png").convert_alpha()
+    dice_img[('D8', i)] = dice
+    print(dice_img)
 def intro():
     blurr = pygame.Surface((int(bord.Screen.breedte), int(bord.Screen.hoogte)), pygame.SRCALPHA)
     pygame.draw.rect(blurr, (255, 255, 255, 200), blurr.get_rect())

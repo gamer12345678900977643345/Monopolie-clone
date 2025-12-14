@@ -1,6 +1,6 @@
 import pygame
 import random
-def koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak):
+def koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak, message_text, message_color, message_timer):
     koop_knop = pygame.draw.rect(bord.Screen.screen, (200,200,100), (900, 450,300,60))
     pygame.draw.rect(bord.Screen.screen, (80,20,20), (900, 450,300,60),5)
     bord.Screen.screen.blit(font.render("Koop nu", True, (230,230,230)), (910,460))
@@ -14,12 +14,18 @@ def koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, fo
                     posities[huidige]["budget"] -= vak["prijs"]
                     posities[huidige]["eigendom"] += vak["prijs"]
                     owned_pos_speler.append({"x": posities["speler"]["x"], "y": posities["speler"]["y"], "waarde": vak["prijs"], "level": vak["level"]})
+                    message_timer = 1000
+                    if message_timer > 0:
+                        bord.Screen.screen.blit(font.render(message_text, True, message_color), (500, 220))
+                        message_text = f"-{vak["prijs"]}"
+                        message_color = (255, 0, 0)
+                        message_timer -= 1
                 else:
                     bord.Screen.screen.blit(font.render("Niet genoeg geld!", True, (230,230,230)), (1200,250))
                     print("you broke!")
                     pygame.display.flip()
                     pygame.time.wait(1000)
-    return
+    return message_text, message_color, message_timer
 
 def move_logica(vakken_opgeschoven, posities, huidige, render, bord, owned_pos_speler, owned_pos_bot, gevangen_beurten, paused, UI, clock):
     resterende_vakken = vakken_opgeschoven
@@ -72,7 +78,7 @@ def move_logica(vakken_opgeschoven, posities, huidige, render, bord, owned_pos_s
     
     render.teken_alles(bord, posities, owned_pos_speler, owned_pos_bot, gevangen_beurten, paused, UI, clock)
 
-def upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot):
+def upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, font, vak, UI, owned_pos_speler, owned_pos_bot, message_text, message_color, message_timer):
     """Returns updated i value"""
     pygame.draw.rect(bord.Screen.screen, (50,100,200), upgrade_knop)
     bord.Screen.screen.blit(UI.font.render("UPGRADE", True, (10,10,10)), upgrade_knop)
@@ -80,10 +86,13 @@ def upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, f
     
     if event.type == pygame.MOUSEBUTTONDOWN:
         if upgrade_knop.collidepoint(event.pos) and i < 1:
-            if posities[huidige]["budget"] >= 100:
+            if posities[huidige]["budget"] >= vak["upgrade"]:
                 vak["huur"] += 10
                 vak["level"] += 1  # Verhoog upgrade level
-                posities[huidige]["budget"] -= 100
+                posities[huidige]["budget"] -= vak["upgrade"]
+                message_text = f"-{vak["upgrade"]}"
+                message_color = (255, 0, 0)  # Groen
+                message_timer = 5
                 
                 # Update level in owned_pos lijst
                 if huidige == "speler":
@@ -97,7 +106,7 @@ def upgrade_mechanism(i, bord, upgrade_knop, posities, event, huidige, geluid, f
             else:
                 bord.Screen.screen.blit(font.render("Niet genoeg geld!", True, (230,230,230)), (910, 590))
     
-    return i
+    return i, message_text, message_color, message_timer
 
 def huur_mechanisme(i, betaler, ontvanger, vak, posities, owned_pos_speler, owned_pos_bot, data, geluid):
     """Betaal huur en return (i, game_state)"""
@@ -121,7 +130,7 @@ def huur_mechanisme(i, betaler, ontvanger, vak, posities, owned_pos_speler, owne
                 verkocht = owned_pos_speler.pop()
                 posities["speler"]["budget"] += verkocht["waarde"]
                 posities["speler"]["eigendom"] -= verkocht["waarde"]
-                
+                vak["level"] = 1
                 for straat in data.values():
                     for v in straat:
                         match = False
@@ -151,7 +160,7 @@ def huur_mechanisme(i, betaler, ontvanger, vak, posities, owned_pos_speler, owne
                 verkocht = owned_pos_bot.pop()
                 posities["bot"]["budget"] += verkocht["waarde"]
                 posities["bot"]["eigendom"] -= verkocht["waarde"]
-                
+                vak["level"] = 1
                 for straat in data.values():
                     for v in straat:
                         match = False
@@ -180,10 +189,10 @@ def huur_mechanisme(i, betaler, ontvanger, vak, posities, owned_pos_speler, owne
 
 def bot_upgrade(i, posities, vak, geluid, owned_pos_bot):
     """Bot upgrade logica - returns updated i"""
-    if i < 1 and posities["bot"]["budget"] >= 100:
+    if i < 1 and posities["bot"]["budget"] >= vak["upgrade"]:
         vak["huur"] += 10
         vak["level"] += 1  # Verhoog upgrade level
-        posities["bot"]["budget"] -= 100
+        posities["bot"]["budget"] -= vak["upgrade"]
         
         # Update level in owned_pos_bot lijst
         for pos in owned_pos_bot:
@@ -211,3 +220,14 @@ def bot_koop(posities, vak, owned_pos_bot):
 def dobbelsteen(dob_keus):
     dobb = random.randint(1, dob_keus)
     return dobb
+def check_budget(posities, owned_pos_speler, owned_pos_bot,vak):
+    if posities["speler"]["budget"] <=0:
+        verkocht = owned_pos_speler.pop()
+        posities["speler"]["budget"] += verkocht["waarde"]
+        posities["speler"]["eigendom"] -= verkocht["waarde"]
+        vak["level"] = 0
+    if posities["bot"]["budget"] <= 0:
+        verkocht = owned_pos_bot.pop()
+        posities["bot"]["budget"] += verkocht["waarde"]
+        posities["bot"]["eigendom"] -= verkocht["waarde"]
+        vak["level"]= 1
