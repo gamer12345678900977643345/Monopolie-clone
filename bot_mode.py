@@ -13,11 +13,23 @@ def bot_game():
     tile_ID = "tileID.json"
     with open(tile_ID, 'r') as json_file:
         data = json.load(json_file)
-    # print(data)
-
-    def dobbelsteen():
-        dobb = random.randint(1,5)
-        return dobb
+        dobbelsteen_choose = True
+    while dobbelsteen_choose == True:
+        UI.dobbelsteen_kies()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if UI.d4_rect.collidepoint(event.pos):
+                    dob_keus = 4
+                    dobbelsteen_choose =False
+                if UI.d6_rect.collidepoint(event.pos):
+                    dob_keus = 6
+                    dobbelsteen_choose =False
+                if UI.d8_rect.collidepoint(event.pos):
+                    dob_keus = 8
+                    dobbelsteen_choose =False
     #stat text render
     font = pygame.font.SysFont("Tahoma", 30)
     def info_screen():
@@ -235,8 +247,8 @@ def bot_game():
                             print(f"Speler zit nog {gevangen_beurten['speler']} beurten gevangen")
                             beurt_num += 1
                         else:
-                            dobb1 = dobbelsteen()
-                            dobb2 = dobbelsteen()
+                            dobb1 = logic.dobbelsteen(dob_keus)
+                            dobb2 = logic.dobbelsteen(dob_keus)
                             geluid.dobb_eff.play()
                             geluid.move_eff.play()
                             dob_tot = dobb1 + dobb2
@@ -267,8 +279,8 @@ def bot_game():
                             print(f"Bot zit nog {gevangen_beurten['bot']} beurten gevangen")
                             beurt_num += 1
                         else:
-                            dobb1 = dobbelsteen()
-                            dobb2 = dobbelsteen()
+                            dobb1 = logic.dobbelsteen(dob_keus)
+                            dobb2 = logic.dobbelsteen(dob_keus)
                             geluid.dobb_eff.play()
                             geluid.move_eff.play()
                             dob_tot = dobb1 + dobb2

@@ -15,6 +15,12 @@ bot_owned = pygame.image.load("assets/owned_bot.png").convert_alpha()
 parking = pygame.image.load("assets/parking.png").convert_alpha()
 jail = pygame.image.load("assets/jail.png").convert_alpha()
 go_to_jail_ = pygame.image.load("assets/go_to_jail.png").convert_alpha()
+d4 = pygame.transform.scale_by(pygame.image.load("assets/D4.png").convert_alpha(), 2)
+d6 = pygame.transform.scale_by(pygame.image.load("assets/D6.png").convert_alpha(),2)
+d8 = pygame.transform.scale_by(pygame.image.load("assets/D8.png").convert_alpha(),2)
+d4_rect = pygame.Rect(400,400, 200,200)
+d6_rect = pygame.Rect(600,400, 200,200)
+d8_rect = pygame.Rect(800,400, 200,200)
 def intro():
     blurr = pygame.Surface((int(bord.Screen.breedte), int(bord.Screen.hoogte)), pygame.SRCALPHA)
     pygame.draw.rect(blurr, (255, 255, 255, 200), blurr.get_rect())
@@ -173,4 +179,15 @@ def end_screen_loss():
     bord.Screen.screen.blit(big_font.render("YOU LOST!", True, (10,10,10)), (550,350))
     pygame.draw.rect(bord.Screen.screen, (230,100,100), replay_knop)
     bord.Screen.screen.blit(font.render("Replay", True, (10,10,10)), replay_knop)
+    return
+def dobbelsteen_kies():
+    blurr = pygame.Surface((int(bord.Screen.breedte), int(bord.Screen.hoogte)), pygame.SRCALPHA)
+    pygame.draw.rect(blurr, (255, 255, 255, 200), blurr.get_rect())
+    bord.Screen.screen.blit(blurr, (0,0))#tot hier is de achtergrond
+    bord.Screen.screen.blit(moneypolie, (350,10))#blit de logo
+    bord.Screen.screen.blit(d4, (400, 400))
+    bord.Screen.screen.blit(d6, (600, 400))
+    bord.Screen.screen.blit(d8, (800, 400))
+    bord.Screen.screen.blit(font.render("kies een dobbelsteen", True, (10,10,10)), (550,600))
+    pygame.display.flip()
     return

@@ -7,6 +7,8 @@ import player
 import UI
 import bot_mode
 import geluid
+import logic
+import render
 pygame.init()
 
 tile_ID = "tileID.json"
@@ -14,9 +16,7 @@ with open(tile_ID, 'r') as json_file:
     data = json.load(json_file)
 print(data)
 
-def dobbelsteen():
-    dobb = random.randint(1,2)
-    return dobb
+
 #stat text render
 font = pygame.font.SysFont("Tahoma", 30)
 
@@ -58,6 +58,7 @@ paused = False
 UI.intro() #start scherm
 player_mode_choose = True
 game_mode = ""
+dobbelsteen_choose = True
 while player_mode_choose == True:
     UI.player_mode()
     for event in pygame.event.get():
@@ -80,6 +81,22 @@ while player_mode_choose == True:
                 player_mode_choose = False
                 bot_mode.bot_game()
                 print("bot")
+while dobbelsteen_choose == True:
+    UI.dobbelsteen_kies()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if UI.d4_rect.collidepoint(event.pos):
+                dob_keus = 4
+                dobbelsteen_choose =False
+            if UI.d6_rect.collidepoint(event.pos):
+                dob_keus = 6
+                dobbelsteen_choose =False
+            if UI.d8_rect.collidepoint(event.pos):
+                dob_keus = 8
+                dobbelsteen_choose =False
 while running:
     bord.Screen.screen.fill((75,170,75))#nice groen aub niet veranderen
     speler_pos = (speler_pos_x, speler_pos_y)
@@ -94,12 +111,13 @@ while running:
                 paused = not paused  # toggle pauze status
             elif not paused:  # alleen andere knoppen als niet gepauzeerd
                 if gooi_knop.collidepoint(event.pos):
-                    dobb1=dobbelsteen()
-                    dobb2=dobbelsteen()
+                    dobb1=logic.dobbelsteen(dob_keus)
+                    dobb2=logic.dobbelsteen(dob_keus)
                     geluid.dobb_eff.play()
                     geluid.move_eff.play()
                     dob_tot = dobb1 + dobb2
                     vakken_opgeschoven = dob_tot #moet spitsen naar x en y en in loop toevoegen
+                    print(f"dob1: {dobb1}, dob2: {dobb2}")
                     #speler beweegt langs gele straat
                     if straat == "geel":
                         speler_pos_y += vakken_opgeschoven*90

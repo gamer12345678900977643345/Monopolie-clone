@@ -1,5 +1,5 @@
 import pygame
-
+import random
 def koop_mechanisme(bord, owned_pos_bot, owned_pos_speler, posities, huidige, font, vak):
     koop_knop = pygame.draw.rect(bord.Screen.screen, (200,200,100), (900, 450,300,60))
     pygame.draw.rect(bord.Screen.screen, (80,20,20), (900, 450,300,60),5)
@@ -208,3 +208,6 @@ def bot_koop(posities, vak, owned_pos_bot):
             "waarde": vak["prijs"],
             "level": vak["level"]
         })
+def dobbelsteen(dob_keus):
+    dobb = random.randint(1, dob_keus)
+    return dobb

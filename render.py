@@ -76,8 +76,3 @@ def teken_alles(bord, posities, owned_pos_speler, owned_pos_bot, gevangen_beurte
     
     pygame.display.flip()
     clock.tick(60)
-# def animatie():
-#     player_0 = pygame.image.load("assets/player0.png").convert_alpha()
-#     bot0 = pygame.image.load("assets/player1.png").convert_alpha()
-
-#     return
