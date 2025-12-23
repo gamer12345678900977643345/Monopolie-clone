@@ -231,3 +231,184 @@ def check_budget(posities, owned_pos_speler, owned_pos_bot,vak):
         posities["bot"]["budget"] += verkocht["waarde"]
         posities["bot"]["eigendom"] -= verkocht["waarde"]
         vak["level"]= 1
+def huur_mechanisme_pvp(
+    i,
+    betaler,
+    ontvanger,
+    vak,
+    posities,
+    owned_pos_speler1,
+    owned_pos_speler2,
+    data,
+    geluid
+):
+    huur = vak["huur"]
+
+    if posities[betaler]["budget"] >= huur:
+        posities[betaler]["budget"] -= huur
+        posities[ontvanger]["budget"] += huur
+        geluid.pay_rent.play()
+        return 1, "playing"
+
+    owned_list = owned_pos_speler1 if betaler == "speler1" else owned_pos_speler2
+
+    if owned_list:
+        verkocht = owned_list.pop()
+        posities[betaler]["budget"] += verkocht["waarde"]
+        posities[betaler]["eigendom"] -= verkocht["waarde"]
+        vak["level"] = 1
+
+        for straat in data.values():
+            for v in straat:
+                if v.get("x") == verkocht["x"] and v.get("y") == verkocht["y"]:
+                    v["eigenaar"] = None
+                    break
+
+        if posities[betaler]["budget"] >= huur:
+            posities[betaler]["budget"] -= huur
+            posities[ontvanger]["budget"] += huur
+            return 1, "playing"
+
+    winnaar = "speler2" if betaler == "speler1" else "speler1"
+    return 1, f"game_over_{winnaar}_wint"
+
+def upgrade_mechanism_pvp(
+    i,
+    bord,
+    upgrade_knop,
+    posities,
+    event,
+    huidige,
+    geluid,
+    font,
+    vak,
+    UI,
+    owned_pos_speler1,
+    owned_pos_speler2,
+    message_text,
+    message_color,
+    message_timer
+):
+    pygame.draw.rect(bord.Screen.screen, (50,100,200), upgrade_knop)
+    bord.Screen.screen.blit(font.render("UPGRADE", True, (10,10,10)), upgrade_knop)
+    pygame.draw.rect(bord.Screen.screen, (10,10,10), upgrade_knop, 2)
+
+    if event.type == pygame.MOUSEBUTTONDOWN and upgrade_knop.collidepoint(event.pos) and i < 1:
+        if posities[huidige]["budget"] >= vak["upgrade"]:
+            vak["huur"] += 10
+            vak["level"] += 1
+            posities[huidige]["budget"] -= vak["upgrade"]
+
+            message_text = f"-{vak['upgrade']}"
+            message_color = (255, 0, 0)
+            message_timer = 60
+
+            owned_list = owned_pos_speler1 if huidige == "speler1" else owned_pos_speler2
+
+            for pos in owned_list:
+                if pos["x"] == posities[huidige]["x"] and pos["y"] == posities[huidige]["y"]:
+                    pos["level"] = vak["level"]
+                    break
+
+            geluid.player_upgrade.play()
+            i = 1
+        else:
+            bord.Screen.screen.blit(
+                font.render("Niet genoeg geld!", True, (230,230,230)),
+                (910, 590)
+            )
+
+    return i, message_text, message_color, message_timer
+
+def koop_mechanisme_pvp(
+    bord,
+    owned_pos_speler1,
+    owned_pos_speler2,
+    posities,
+    huidige,
+    font,
+    vak,
+    message_text,
+    message_color,
+    message_timer
+):
+    koop_knop = pygame.draw.rect(bord.Screen.screen, (200,200,100), (900, 450,300,60))
+    pygame.draw.rect(bord.Screen.screen, (80,20,20), koop_knop, 5)
+    bord.Screen.screen.blit(font.render("Koop nu", True, (230,230,230)), (910,460))
+
+    for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONDOWN and koop_knop.collidepoint(event.pos):
+            if posities[huidige]["budget"] >= vak["prijs"]:
+                vak["eigenaar"] = huidige
+                posities[huidige]["budget"] -= vak["prijs"]
+                posities[huidige]["eigendom"] += vak["prijs"]
+
+                owned_list = owned_pos_speler1 if huidige == "speler1" else owned_pos_speler2
+                owned_list.append({
+                    "x": posities[huidige]["x"],
+                    "y": posities[huidige]["y"],
+                    "waarde": vak["prijs"],
+                    "level": vak["level"]
+                })
+
+                message_text = f"-{vak['prijs']}"
+                message_color = (255, 0, 0)
+                message_timer = 60
+            else:
+                bord.Screen.screen.blit(
+                    font.render("Niet genoeg geld!", True, (230,230,230)),
+                    (910, 520)
+                )
+
+    return message_text, message_color, message_timer
+
+def move_logica_pvp(vakken_opgeschoven, posities, huidige, render, bord, owned_pos_speler1, owned_pos_speler2, gevangen_beurten, paused, UI, clock, player):
+    resterende_vakken = vakken_opgeschoven
+    
+    while resterende_vakken > 0:
+        if posities[huidige]['straat'] == 'geel':
+            vakken_tot_hoek = (580 - posities[huidige]["y"]) // 90
+            
+            if resterende_vakken <= vakken_tot_hoek:
+                posities[huidige]["y"] += resterende_vakken * 90
+                resterende_vakken = 0
+            else:
+                posities[huidige]["y"] = 580
+                posities[huidige]['straat'] = 'rood'
+                resterende_vakken -= (vakken_tot_hoek + 1)
+        
+        elif posities[huidige]['straat'] == 'rood':
+            vakken_tot_hoek = (posities[huidige]["x"] - 75) // 80
+            
+            if resterende_vakken <= vakken_tot_hoek:
+                posities[huidige]["x"] -= resterende_vakken * 80
+                resterende_vakken = 0
+            else:
+                posities[huidige]["x"] = 75
+                posities[huidige]['straat'] = 'groen'
+                resterende_vakken -= (vakken_tot_hoek + 1)
+        
+        elif posities[huidige]['straat'] == 'groen':
+            vakken_tot_hoek = (posities[huidige]["y"] - 130) // 90
+            
+            if resterende_vakken <= vakken_tot_hoek:
+                posities[huidige]["y"] -= resterende_vakken * 90
+                resterende_vakken = 0
+            else:
+                posities[huidige]["y"] = 130
+                posities[huidige]['straat'] = 'blauw'
+                resterende_vakken -= (vakken_tot_hoek + 1)
+        
+        elif posities[huidige]['straat'] == 'blauw':
+            vakken_tot_hoek = (795 - posities[huidige]["x"]) // 80
+            
+            if resterende_vakken <= vakken_tot_hoek:
+                posities[huidige]["x"] += resterende_vakken * 80
+                resterende_vakken = 0
+            else:
+                posities[huidige]["x"] = 795
+                posities[huidige]["budget"] += 200
+                posities[huidige]['straat'] = 'geel'
+                resterende_vakken -= (vakken_tot_hoek + 1)
+    
+    render.teken_alles_pvp(bord, posities, owned_pos_speler1, owned_pos_speler2, gevangen_beurten, paused, UI, clock, player)
