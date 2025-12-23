@@ -5,6 +5,10 @@ import json
 import random
 import player
 import UI
+import bot_mode
+import geluid
+import logic
+import render
 pygame.init()
 
 tile_ID = "tileID.json"
@@ -12,9 +16,7 @@ with open(tile_ID, 'r') as json_file:
     data = json.load(json_file)
 print(data)
 
-def dobbelsteen():
-    dobb = random.randint(1,2)
-    return dobb
+
 #stat text render
 font = pygame.font.SysFont("Tahoma", 30)
 
@@ -46,14 +48,55 @@ def koop_mechanisme():
                 pygame.display.flip()
                 pygame.time.wait(1000)
     return
-
+geluid.background()
 speler_pos_x = 795
 speler_pos_y = 130
 clock = pygame.time.Clock()
 straat = "geel"
 running = True
-paused = False  # nieuwe variabele voor pauze status
+paused = False 
 UI.intro() #start scherm
+player_mode_choose = True
+game_mode = ""
+dobbelsteen_choose = True
+while player_mode_choose == True:
+    UI.player_mode()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if UI.pvp_knop.collidepoint(event.pos):
+                naam1 = UI.start_settings()
+                player.speler1.naam = naam1
+                print(f"Speler 1: {naam1}")
+
+                naam2 = UI.start_settings()
+                player.speler2.naam = naam2
+                print(f"Speler 2: {naam2}")
+                game_mode = "pvp"
+                player_mode_choose = False
+            if UI.bot_knop.collidepoint(event.pos):
+                game_mode = "bot"
+                player_mode_choose = False
+                bot_mode.bot_game()
+                print("bot")
+while dobbelsteen_choose == True:
+    UI.dobbelsteen_kies()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if UI.d4_rect.collidepoint(event.pos):
+                dob_keus = 4
+                dobbelsteen_choose =False
+            if UI.d6_rect.collidepoint(event.pos):
+                dob_keus = 6
+                dobbelsteen_choose =False
+            if UI.d8_rect.collidepoint(event.pos):
+                dob_keus = 8
+                dobbelsteen_choose =False
 while running:
     bord.Screen.screen.fill((75,170,75))#nice groen aub niet veranderen
     speler_pos = (speler_pos_x, speler_pos_y)
@@ -68,10 +111,13 @@ while running:
                 paused = not paused  # toggle pauze status
             elif not paused:  # alleen andere knoppen als niet gepauzeerd
                 if gooi_knop.collidepoint(event.pos):
-                    dobb1=dobbelsteen()
-                    dobb2=dobbelsteen()
+                    dobb1=logic.dobbelsteen(dob_keus)
+                    dobb2=logic.dobbelsteen(dob_keus)
+                    geluid.dobb_eff.play()
+                    geluid.move_eff.play()
                     dob_tot = dobb1 + dobb2
                     vakken_opgeschoven = dob_tot #moet spitsen naar x en y en in loop toevoegen
+                    print(f"dob1: {dobb1}, dob2: {dobb2}")
                     #speler beweegt langs gele straat
                     if straat == "geel":
                         speler_pos_y += vakken_opgeschoven*90
@@ -182,8 +228,8 @@ while running:
         red_tile_ID = (x, y)#(80,90)
     
     bord.Screen.screen.blit(player_0, speler_pos)#blit de speler pion
-    bord.Screen.screen.blit(font.render(f"Budget: {player.speler1.balans}", True, (230,230,230)), (1200, 150))
-    bord.Screen.screen.blit(font.render(f"Eigendommen: {player.speler1.eigendom}", True, (230,230,230)), (1200,200))
+    bord.Screen.screen.blit(font.render(f"Budget: {player.speler1.balans}", True, (230,230,230)), (200, 220))
+    bord.Screen.screen.blit(font.render(f"Eigendommen: {player.speler1.eigendom}", True, (230,230,230)), (200,270))
     
     # teken pauze menu als gepauzeerd
     if paused:

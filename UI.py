@@ -1,12 +1,41 @@
 import pygame
 import bord
 import sys
+import geluid
 pygame.init()
 rect = pygame.Rect(540,400,200,100) #pos startknop vak
 moneypolie = pygame.image.load("assets/moneypolie.png").convert_alpha()
 menu_knop = pygame.image.load("assets/menu_icon.png").convert_alpha()
 menu_knop_rect = pygame.Rect(600,0,30,30)
 font = pygame.font.SysFont("Tahoma", 30)
+big_font = pygame.font.SysFont("Tahoma", 100)
+small_font = pygame.font.SysFont("Tahoma", 20)
+speler_owned = pygame.image.load("assets/owned.png").convert_alpha()
+bot_owned = pygame.image.load("assets/owned_bot.png").convert_alpha()
+parking = pygame.image.load("assets/parking.png").convert_alpha()
+jail = pygame.image.load("assets/jail.png").convert_alpha()
+go_to_jail_ = pygame.image.load("assets/go_to_jail.png").convert_alpha()
+d4 = pygame.transform.scale_by(pygame.image.load("assets/D4.png").convert_alpha(), 2)
+d6 = pygame.transform.scale_by(pygame.image.load("assets/D6.png").convert_alpha(),2)
+d8 = pygame.transform.scale_by(pygame.image.load("assets/D8.png").convert_alpha(),2)
+d4_rect = pygame.Rect(400,400, 200,200)
+d6_rect = pygame.Rect(600,400, 200,200)
+d8_rect = pygame.Rect(800,400, 200,200)
+dice_img= {}
+for i in range(1,5):
+    dice= pygame.image.load(f"assets/D4-{i}.png").convert_alpha()
+    dice_img[('D4', i)] = dice
+    print(dice_img)
+
+for i in range(1,7):
+    dice = pygame.image.load(f"assets/D6-{i}.png").convert_alpha()
+    dice_img[('D6', i)] = dice
+    print(dice_img)
+
+for i in range(1,9):
+    dice = pygame.image.load(f"assets/D8-{i}.png").convert_alpha()
+    dice_img[('D8', i)] = dice
+    print(dice_img)
 def intro():
     blurr = pygame.Surface((int(bord.Screen.breedte), int(bord.Screen.hoogte)), pygame.SRCALPHA)
     pygame.draw.rect(blurr, (255, 255, 255, 200), blurr.get_rect())
@@ -27,31 +56,153 @@ def intro():
                     waiting = False    
     pygame.display.flip()
     return
-
+huidige_speler_nummer = 1
 def start_settings():
-    blurr = pygame.Surface((int(bord.Screen.breedte), int(bord.Screen.hoogte)), pygame.SRCALPHA)
+    global huidige_speler_nummer 
+    clock = pygame.time.Clock()
+    user_name = ""  # lege string om tekst op te slaan
+    # Text input box positie
+    input_box = pygame.Rect(460, 400, 600, 50)
+    
+    blurr = pygame.Surface((1920, 1080), pygame.SRCALPHA)
     pygame.draw.rect(blurr, (255, 255, 255, 200), blurr.get_rect())
-    bord.Screen.screen.blit(blurr, (0,0)) #tot hier achtergrond
+    bord.Screen.screen.blit(blurr, (0,0))
     
+    # Start knop
+    start_rect = pygame.Rect(710, 500, 200, 60)
+    waiting = True
+    while waiting:
+        clock.tick(60)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:  # Enter = klaar
+                    if user_name:  # alleen als er iets is ingevuld
+                        waiting = False
+                elif event.key == pygame.K_BACKSPACE:  # Backspace = verwijder laatste letter
+                    user_name = user_name[:-1]
+                else:
+                    # Voeg letter toe (maximaal 20 karakters)
+                    if len(user_name) < 20:
+                        user_name += event.unicode  # event.unicode geeft de letter
+            
+            # Check START knop
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if start_rect.collidepoint(event.pos):
+                    if user_name:
+                        waiting = False
+        
+        # Herteken scherm
+        blurr = pygame.Surface((1920, 1080), pygame.SRCALPHA)
+        pygame.draw.rect(blurr, (255, 255, 255, 200), blurr.get_rect())
+        bord.Screen.screen.blit(blurr, (0,0))
+        
+        # Teken instructie
+        bord.Screen.screen.blit(font.render("Voer je naam in:", True, (10,10,10)), (460, 350))
+        
+        # Teken input box
+        pygame.draw.rect(bord.Screen.screen, (255, 255, 255), input_box)
+        pygame.draw.rect(bord.Screen.screen, (10, 10, 10), input_box, 2)  # border
+        
+        # Teken de ingevoerde tekst
+        text_surface = font.render(user_name, True, (10, 10, 10))
+        bord.Screen.screen.blit(text_surface, (input_box.x + 10, input_box.y + 10))
+        
+        # Teken START knop
+        pygame.draw.rect(bord.Screen.screen, (255,100,0), start_rect)
+        bord.Screen.screen.blit(font.render("START", True, (10,10,10)), (760, 515))
+        
+        pygame.display.flip()
     
-    return
+    return user_name if user_name else "Speler1"
 
-exit_knop_rect = pygame.Rect(150,500,160,100)
+exit_knop_rect = pygame.Rect(150,550,160,100)
 continue_knop_rect= pygame.Rect(150,700,160,100)
-
+mute_knop_rect = pygame.Rect(150,250,150,100)
+unmute_knop_rect = pygame.Rect(150,400,150,100 )
 def pause_menu():
     # teken blur en menu overlay
     blurr = pygame.Surface((1920,1080), pygame.SRCALPHA)
     pygame.draw.rect(blurr, (255, 255, 255, 210), blurr.get_rect())
     bord.Screen.screen.blit(blurr, (0,0)) #tot hier achtergrond
-    
     # teken knoppen
     pygame.draw.rect(bord.Screen.screen, (230,100,100), exit_knop_rect)
     pygame.draw.rect(bord.Screen.screen, (230,100,100), continue_knop_rect)
-    bord.Screen.screen.blit(font.render("EXIT", True,(230,230,230)), (185,560))
-    bord.Screen.screen.blit(font.render("CONTINUE", True,(230,230,230)), (155,760))
-    
+    pygame.draw.rect(bord.Screen.screen, (230,100,100), mute_knop_rect)
+    pygame.draw.rect(bord.Screen.screen, (230,100,100), unmute_knop_rect)
+    for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if mute_knop_rect.collidepoint(event.pos):
+                pygame.mixer.music.pause()
+                geluid.dobb_eff.set_volume(0)
+                geluid.move_eff.set_volume(0)
+                geluid.get_rent.set_volume(0)
+                geluid.pay_rent.set_volume(0)
+                geluid.player_upgrade.set_volume(0)
+                geluid.bot_upgtade.set_volume(0)
+                geluid.player_los.set_volume(0)
+                geluid.player_win.set_volume(0)
+            if unmute_knop_rect.collidepoint(event.pos):
+                pygame.mixer.music.unpause()
+                geluid.dobb_eff.set_volume(1)
+                geluid.move_eff.set_volume(1)
+                geluid.get_rent.set_volume(1)
+                geluid.pay_rent.set_volume(1)
+                geluid.player_upgrade.set_volume(1)
+                geluid.bot_upgtade.set_volume(1)
+                geluid.player_los.set_volume(1)
+                geluid.player_win.set_volume(1)
+    bord.Screen.screen.blit(font.render("EXIT", True,(230,230,230)), exit_knop_rect)
+    bord.Screen.screen.blit(font.render("CONTINUE", True,(230,230,230)), continue_knop_rect)
+    bord.Screen.screen.blit(big_font.render("PAUSE", True, (10,10,10)), (600,0))
+    bord.Screen.screen.blit(font.render("MUTE", True, (230,230,230)), mute_knop_rect)
+    bord.Screen.screen.blit(font.render("UNMUTE", True, (230,230,230)), unmute_knop_rect)
     # teken menu knop bovenop
     bord.Screen.screen.blit(menu_knop, (600,0))
-    
+    return
+pvp_knop = pygame.Rect(800,300,200,100)
+bot_knop = pygame.Rect(800,450,200,100)
+def player_mode():
+    blurr = pygame.Surface((1920, 1080), pygame.SRCALPHA)
+    pygame.draw.rect(blurr, (255, 255, 255, 200), blurr.get_rect())
+    bord.Screen.screen.blit(blurr, (0,0))
+    pygame.draw.rect(bord.Screen.screen, (230,100,100), pvp_knop)
+    pygame.draw.rect(bord.Screen.screen, (230,100,100), bot_knop)
+    bord.Screen.screen.blit(font.render("PVP", True, (10,10,10)), (850,350))
+    bord.Screen.screen.blit(font.render("bot", True, (10,10,10)), (850,500))
+    pygame.display.flip()
+    return
+replay_knop = pygame.Rect(700,600,200,100)
+def end_screen_win():
+    blurr = pygame.Surface((1920, 1080), pygame.SRCALPHA)
+    pygame.draw.rect(blurr, (0, 50, 0, 200), blurr.get_rect())
+    bord.Screen.screen.blit(blurr, (0,0))
+    bord.Screen.screen.blit(moneypolie, (500,10))#blit de logo
+    bord.Screen.screen.blit(big_font.render("YOU WON!", True, (10,10,10)), (550,350))
+    pygame.draw.rect(bord.Screen.screen, (230,100,100), replay_knop)
+    bord.Screen.screen.blit(font.render("Replay", True, (10,10,10)), replay_knop)
+    return
+def end_screen_loss():
+    blurr = pygame.Surface((1920, 1080), pygame.SRCALPHA)
+    pygame.draw.rect(blurr, (0, 50, 0, 200), blurr.get_rect())
+    bord.Screen.screen.blit(blurr, (0,0))
+    bord.Screen.screen.blit(moneypolie, (500,10))#blit de logo
+    bord.Screen.screen.blit(big_font.render("YOU LOST!", True, (10,10,10)), (550,350))
+    pygame.draw.rect(bord.Screen.screen, (230,100,100), replay_knop)
+    bord.Screen.screen.blit(font.render("Replay", True, (10,10,10)), replay_knop)
+    return
+def dobbelsteen_kies():
+    blurr = pygame.Surface((int(bord.Screen.breedte), int(bord.Screen.hoogte)), pygame.SRCALPHA)
+    pygame.draw.rect(blurr, (255, 255, 255, 200), blurr.get_rect())
+    bord.Screen.screen.blit(blurr, (0,0))#tot hier is de achtergrond
+    bord.Screen.screen.blit(moneypolie, (350,10))#blit de logo
+    bord.Screen.screen.blit(d4, (400, 400))
+    bord.Screen.screen.blit(d6, (600, 400))
+    bord.Screen.screen.blit(d8, (800, 400))
+    bord.Screen.screen.blit(font.render("kies een dobbelsteen", True, (10,10,10)), (550,600))
+    pygame.display.flip()
     return
